@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "dev": "ts-node ./lambda/index.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -20,6 +21,7 @@
     "typescript": "~5.6.3"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.1",
     "aws-cdk-lib": "2.190.0",
     "constructs": "^10.0.0",
     "hono": "^4.7.8"
