@@ -22,8 +22,11 @@
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",
+    "@types/airtable": "^0.10.0",
+    "airtable": "^0.12.2",
     "aws-cdk-lib": "2.190.0",
     "constructs": "^10.0.0",
+    "dotenv": "^16.5.0",
     "hono": "^4.7.8"
   }
 }
