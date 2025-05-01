@@ -26,10 +26,19 @@ function App() {
   console.log(updates)
   return (
     <>
-      <h1>Resx dashboard</h1>
-      <ul>
-        {updates && updates.map(u => (<li>{`Update ${u["ID"]} does ${ u["Needs intervention"] == 0 ? 'not ': ''}need attention`}</li>))}
-      </ul>
+      <p>Resx dashboard</p>
+      <nav>
+        <ul>
+          <li>Updates</li>
+          <li>Submit update</li>
+        </ul>
+      </nav>
+      <main>
+        <h1>Updates</h1>
+        <ul>
+          {updates && updates.map(u => (<li>{`Update ${u["ID"]} does ${ u["Needs intervention"] == 0 ? 'not ': ''}need attention`}</li>))}
+        </ul>
+      </main>
     </>
   )
 }

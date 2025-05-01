@@ -6,6 +6,7 @@ import * as dotenv from "dotenv";
 import Airtable = require('airtable');
 
 const app = new Hono()
+app.use('*', cors({ origin: ['http://localhost:5173'] }))
 const env = dotenv.config({ path: "./.env" }).parsed;
 const AIRTABLE_API_KEY = env?.AIRTABLE_API_KEY || '';
 const AIRTABLE_BASE_ID = env?.AIRTABLE_BASE_ID || '';
@@ -17,12 +18,15 @@ const tableNames = {
     BLOCKERS: 'Blockers',
 }
 
-// TODO make time a param
 async function getUpdates() {
+    const currentDate = new Date();
+    const oneMonthAgo = new Date(currentDate);
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
     try {
         const response = await base(tableNames.UPDATES).select({
             view: "Grid view",
-            // filterByFormula: `IS_AFTER({ Created }, "1/1/2025")`
+            filterByFormula: `IS_AFTER({ Created }, "${oneMonthAgo.toLocaleDateString()}")`
         })
         const records: any = []
         await response.eachPage(function page(_records: any, fetchNextPage: Function) {
@@ -38,9 +42,6 @@ async function getUpdates() {
 }
 
 app.get('/', (c) => c.text('Hello Hono!'))
-
-// TODO filter by date
-app.use('*', cors({ origin: ['http://localhost:5173'] }))
 
 app.get('/updates', async (c) => {
     const updates = await getUpdates();
