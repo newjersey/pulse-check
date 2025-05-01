@@ -21,41 +21,41 @@ export class BackendStack extends Stack {
     fn.addFunctionUrl({
       authType: FunctionUrlAuthType.NONE,
     })
-    new LambdaRestApi(this, 'myapi', {
+    new LambdaRestApi(this, 'pulse-check-api', {
       handler: fn,
     })
 
 
-    // Create an S3 bucket to host the React app
-    const websiteBucket = new Bucket(this, 'WebsiteBucket', {
-      websiteIndexDocument: 'index.html',
-      blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-    });
+    // // Create an S3 bucket to host the React app
+    // const websiteBucket = new Bucket(this, 'WebsiteBucket', {
+    //   websiteIndexDocument: 'index.html',
+    //   blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+    // });
 
-    // Deploy React app to S3
-    new BucketDeployment(this, 'DeployWebsite', {
-      sources: [Source.asset(join(__dirname, '../react-app/build'))],
-      destinationBucket: websiteBucket,
-    });
+    // // Deploy React app to S3
+    // new BucketDeployment(this, 'DeployWebsite', {
+    //   sources: [Source.asset(join(__dirname, '../react-app/build'))],
+    //   destinationBucket: websiteBucket,
+    // });
 
-    // Create a CloudFront Origin Access Identity
-    const originAccessIdentity = new OriginAccessIdentity(this, 'OAI');
+    // // Create a CloudFront Origin Access Identity
+    // const originAccessIdentity = new OriginAccessIdentity(this, 'OAI');
 
-    // Grant CloudFront access to the S3 bucket
-    websiteBucket.grantRead(originAccessIdentity);
+    // // Grant CloudFront access to the S3 bucket
+    // websiteBucket.grantRead(originAccessIdentity);
 
-    // Create a CloudFront distribution to serve the React app
-    const distribution = new Distribution(this, 'WebsiteDistribution', {
-      defaultBehavior: {
-        origin: new S3BucketOrigin(websiteBucket),
-        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      },
-      defaultRootObject: 'index.html',
-    });
+    // // Create a CloudFront distribution to serve the React app
+    // const distribution = new Distribution(this, 'WebsiteDistribution', {
+    //   defaultBehavior: {
+    //     origin: new S3BucketOrigin(websiteBucket),
+    //     viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    //   },
+    //   defaultRootObject: 'index.html',
+    // });
 
-    // Output the CloudFront URL
-    new CfnOutput(this, 'DistributionDomainName', {
-      value: distribution.distributionDomainName,
-    });
+    // // Output the CloudFront URL
+    // new CfnOutput(this, 'DistributionDomainName', {
+    //   value: distribution.distributionDomainName,
+    // });
   }
 }

@@ -1,5 +1,6 @@
 import { Hono } from 'hono'
 import { handle } from 'hono/aws-lambda'
+import { logger } from 'hono/logger'
 import { serve } from '@hono/node-server'
 import { cors } from 'hono/cors'
 import * as dotenv from "dotenv";
@@ -7,9 +8,12 @@ import Airtable = require('airtable');
 
 const app = new Hono()
 app.use('*', cors({ origin: ['http://localhost:5173'] }))
+app.use(logger())
+
 const env = dotenv.config({ path: "./.env" }).parsed;
 const AIRTABLE_API_KEY = env?.AIRTABLE_API_KEY || '';
 const AIRTABLE_BASE_ID = env?.AIRTABLE_BASE_ID || '';
+
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
 const tableNames = {
@@ -26,7 +30,7 @@ async function getUpdates() {
     try {
         const response = await base(tableNames.UPDATES).select({
             view: "Grid view",
-            filterByFormula: `IS_AFTER({ Created }, "${oneMonthAgo.toLocaleDateString()}")`
+            filterByFormula: `IS_AFTER({Created}, "${oneMonthAgo.toLocaleDateString()}")`
         })
         const records: any = []
         await response.eachPage(function page(_records: any, fetchNextPage: Function) {
@@ -66,7 +70,7 @@ app.get('/updates', async (c) => {
 //     return c.text('Post updates!')
 // })
 
-app.get('/projects/:id', (c) => c.text('Get project!'))
+// app.get('/projects/:id', (c) => c.text('Get project!'))
 
 serve({ fetch: app.fetch, port: 3001 })
 
