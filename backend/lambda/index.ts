@@ -11,8 +11,8 @@ app.use('*', cors({ origin: ['http://localhost:5173'] }))
 app.use(logger())
 
 const env = dotenv.config({ path: "./.env" }).parsed;
-const AIRTABLE_API_KEY = env?.AIRTABLE_API_KEY || '';
-const AIRTABLE_BASE_ID = env?.AIRTABLE_BASE_ID || '';
+const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || env?.AIRTABLE_API_KEY || '';
+const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || env?.AIRTABLE_BASE_ID || '';
 
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
@@ -45,7 +45,7 @@ async function getUpdates() {
     }
 }
 
-app.get('/', (c) => c.text('Hello Hono!'))
+app.get('/', (c) => c.text('Hello API'))
 
 app.get('/updates', async (c) => {
     const updates = await getUpdates();

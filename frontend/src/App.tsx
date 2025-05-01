@@ -7,7 +7,7 @@ function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('http://localhost:3001/updates'); // Replace with your backend URL
+        const response = await fetch(`${import.meta.env.VITE_ENDPOINT}/updates`); // Replace with your backend URL
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -23,7 +23,6 @@ function App() {
     fetchData();
   }, [setUpdates])
 
-  console.log(updates)
   return (
     <>
       <p>Resx dashboard</p>
