@@ -45,7 +45,7 @@ async function getUpdates() {
     }
 }
 
-app.get('/', (c) => c.text('Hello API'))
+app.get('/', (c) => c.text('Hello API!'))
 
 app.get('/updates', async (c) => {
     const updates = await getUpdates();

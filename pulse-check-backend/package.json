@@ -1,33 +1,33 @@
 {
-  "name": "backend",
+  "name": "pulse-check-backend",
   "version": "0.1.0",
   "bin": {
-    "backend": "bin/backend.js"
+    "pulse-check-backend": "bin/pulse-check-backend.js"
   },
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "dev": "ts-node ./lambda/index.ts"
+    "start": "nodemon api/index.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
     "@types/node": "22.7.9",
     "aws-cdk": "2.1012.0",
+    "esbuild": "^0.25.3",
     "jest": "^29.7.0",
+    "nodemon": "^3.1.10",
     "ts-jest": "^29.2.5",
     "ts-node": "^10.9.2",
     "typescript": "~5.6.3"
   },
   "dependencies": {
     "@hono/node-server": "^1.14.1",
-    "@types/airtable": "^0.10.0",
     "airtable": "^0.12.2",
     "aws-cdk-lib": "2.190.0",
     "constructs": "^10.0.0",
     "dotenv": "^16.5.0",
-    "esbuild": "^0.25.3",
     "hono": "^4.7.8"
   }
 }

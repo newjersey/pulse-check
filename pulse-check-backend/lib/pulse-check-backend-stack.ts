@@ -9,7 +9,7 @@ import { Distribution, ViewerProtocolPolicy, OriginAccessIdentity } from 'aws-cd
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { join } from 'path';
 
-export class BackendStack extends Stack {
+export class PulseCheckBackendStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
@@ -24,7 +24,6 @@ export class BackendStack extends Stack {
     new LambdaRestApi(this, 'pulse-check-api', {
       handler: fn,
     })
-
 
     // // Create an S3 bucket to host the React app
     // const websiteBucket = new Bucket(this, 'WebsiteBucket', {
