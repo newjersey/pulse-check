@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [updates, setUpdates] = useState<Object[]>()
+  const [updates, setUpdates] = useState<{ ID: string, "Needs intervention": string | number}[]>()
 
   useEffect(() => {
     const fetchData = async () => {
