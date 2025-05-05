@@ -1,42 +1,42 @@
-import { useEffect, useState } from 'react'
+import { Routes, Route, NavLink } from 'react-router';
+import Updates from './pages/Updates';
 import './App.css'
+import SubmitUpdate from './pages/SubmitUpdate';
 
 function App() {
-  const [updates, setUpdates] = useState<{ ID: string, "Needs intervention": string | number}[]>()
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_ENDPOINT}/updates`); // Replace with your backend URL
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const result = await response.json();
-        setUpdates(result);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        // setLoading(false);
-      }
-    };
-    // Call the async function
-    fetchData();
-  }, [setUpdates])
-
   return (
     <>
-      <p>Resx dashboard</p>
-      <nav>
-        <ul>
-          <li>Updates</li>
-          <li>Submit update</li>
-        </ul>
-      </nav>
-      <main>
-        <h1>Updates</h1>
-        <ul>
-          {updates && updates.map(u => (<li>{`Update ${u["ID"]} does ${ u["Needs intervention"] == 0 ? 'not ': ''}need attention`}</li>))}
-        </ul>
+      <header className="usa-header usa-header--basic">
+        <a className="usa-skipnav" href="#main-content">Skip to main content</a>
+        <div className='usa-nav-container'>
+          <div className="usa-navbar">
+            <div className="usa-logo"><span className="usa-logo__text">Resx dashboard</span></div>
+          </div>
+          <nav className="usa-nav">
+            <ul className="usa-nav__primary usa-accordion">
+              <li className="usa-nav__primary-item">
+                <NavLink to="/" className={({ isActive }) =>
+                  isActive ? "active" : ""
+              }>
+                  Updates
+                </NavLink>
+              </li>
+              <li className="usa-nav__primary-item">
+                <NavLink to="/submit-update" className={({ isActive }) =>
+                  isActive ? "active" : ""
+              }>
+                  Submit an update
+                </NavLink>
+              </li>          
+            </ul>
+          </nav>
+          </div>
+      </header>
+      <main id="main-content" className="grid-container">
+        <Routes>
+          <Route path="/" element={<Updates/>} />
+          <Route path="/submit-update" element={<SubmitUpdate/>} />
+        </Routes>
       </main>
     </>
   )

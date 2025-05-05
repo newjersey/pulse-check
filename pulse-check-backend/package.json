@@ -9,7 +9,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "start": "nodemon api/index.ts"
+    "dev": "nodemon api/index.ts"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
