@@ -16,24 +16,19 @@ const env = dotenv.config({ path: "./.env" }).parsed;
 
 const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || env?.BASIC_AUTH_USERNAME || '';
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || env?.BASIC_AUTH_PASSWORD || '';
-app.use(
-  '/*',
-  basicAuth({
-    username: BASIC_AUTH_USERNAME,
-    password: BASIC_AUTH_PASSWORD,
-  })
-)
+// app.use(
+//   '/*',
+//   basicAuth({
+//     username: BASIC_AUTH_USERNAME,
+//     password: BASIC_AUTH_PASSWORD,
+//   })
+// )
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || env?.AIRTABLE_API_KEY || '';
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || env?.AIRTABLE_BASE_ID || '';
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
 app.get('/', (c) => c.text('Hello API!'))
-
-app.get('/updates', async (c) => {
-  const updates = await getUpdates(base);
-  return c.json(updates);
-})
 
 // TODO update blockers etc
 // app.post('/updates', (c) => {
