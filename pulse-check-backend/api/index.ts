@@ -5,6 +5,7 @@ import { serve } from '@hono/node-server'
 import { cors } from 'hono/cors'
 import * as dotenv from "dotenv";
 import Airtable = require('airtable');
+import { getProjects, getUpdates } from './utils'
 
 const app = new Hono()
 app.use('*', cors({ origin: ['http://localhost:5173'] }))
@@ -16,59 +17,21 @@ const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || env?.AIRTABLE_BASE_ID |
 
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
-const tableNames = {
-    UPDATES: 'Updates',
-    PROJECTS: 'Projects',
-    BLOCKERS: 'Blockers',
-}
-
-async function getUpdates() {
-    const currentDate = new Date();
-    const oneMonthAgo = new Date(currentDate);
-    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
-
-    try {
-        const response = await base(tableNames.UPDATES).select({
-            view: "Grid view",
-            filterByFormula: `IS_AFTER({Created}, "${oneMonthAgo.toLocaleDateString()}")`
-        })
-        const records: any = []
-        await response.eachPage(function page(_records: any, fetchNextPage: Function) {
-            _records.forEach(function (record: any) {
-                records.push(record.fields)
-            });
-            fetchNextPage();
-        });
-        return records
-    } catch(e) {
-        console.log(e)
-    }
-}
-
 app.get('/', (c) => c.text('Hello API!'))
 
 app.get('/updates', async (c) => {
-    const updates = await getUpdates();
-    return c.json(updates);
+  const updates = await getUpdates(base);
+  return c.json(updates);
 })
 
 // TODO update blockers etc
 // app.post('/updates', (c) => {
-//     base('Updates').create([
-//         {
-//           "fields": {}
-//         }
-//       ], function(err, records) {
-//         if (err) {
-//           console.error(err);
-//           return;
-//         }
-//         records.forEach(function (record) {
-//           console.log(record.getId());
-//         });
-//       });
-//     return c.text('Post updates!')
 // })
+
+app.get('/projects', async c => {
+  const projects = await getProjects(base);
+  return c.json(projects);
+})
 
 // app.get('/projects/:id', (c) => c.text('Get project!'))
 
