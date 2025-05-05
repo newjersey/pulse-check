@@ -3,6 +3,7 @@ import Projects from './pages/Projects';
 import './App.css'
 import SubmitUpdate from './pages/SubmitUpdate';
 import { DataContextProvider } from './utils/DataContext';
+import Login from './pages/Login';
 
 function App() {
   return (
@@ -17,12 +18,13 @@ function App() {
       </header>
       <main id="main-content" className="grid-container">
         <Routes>
+          <Route path="/login" element={<Login/>} />
           <Route path="/" element={<Projects/>} />
           <Route path="/projects" element={<Projects/>} />
           <Route path="/projects/:projectId" element={<Projects/>} />
           <Route path="/projects/:projectId" element={<Projects/>} />
           <Route path="/projects/:projectId/update" element={<SubmitUpdate  />} />
-        </Routes>
+      </Routes>
       </main>
     </DataContextProvider>
   )

@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { Navigate } from 'react-router';
 
 export type Project = {
   ID: string;
@@ -6,6 +7,7 @@ export type Project = {
 }
 
 export type DataContextType = {
+  authToken: string | undefined;
   setAuthToken: Function;
   loading: Boolean;
   projects: Project[];
@@ -14,6 +16,7 @@ export type DataContextType = {
 }
 
 const DataContext = createContext<DataContextType>({
+  authToken: undefined,
   setAuthToken: () => {},
   loading: false,
   projects: [],
@@ -27,8 +30,8 @@ export const useDataContext = () => useContext(DataContext)
 
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
-  const [authToken, setAuthToken] = useState(null);
-  const [projects, setProjects] = useState<Project[]>([])
+  const [authToken, setAuthToken] = useState();
+  const [projects, setProjects] = useState<Project[]>([]) // consider setting by ID instead?
   const [milestones, setMilestones] = useState<any[]>([])
   const [milestoneUpdates, setMilestoneUpdates] = useState<any[]>([])
   
@@ -36,7 +39,10 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`${import.meta.env.VITE_ENDPOINT}/projects`, { headers: { Authorization: 'Basic ' + authToken }});
+        const response = await fetch(
+          `${import.meta.env.VITE_ENDPOINT}/projects`,
+          { headers: { Authorization: 'Basic ' + authToken } }
+        );
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -48,10 +54,12 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       }
     };
-    fetchData();
-  }, [setProjects])
+    if (authToken) {
+      fetchData();
+    }
+  }, [authToken, setLoading, setProjects])
 
-  return <Provider value={{ setAuthToken, loading, projects, milestones, milestoneUpdates }}>
+  return <Provider value={{ authToken, setAuthToken, loading, projects, milestones, milestoneUpdates }}>
     {children}
   </Provider>
 }

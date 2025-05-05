@@ -3,7 +3,7 @@ import { Construct } from 'constructs';
 import { Runtime, FunctionUrlAuthType } from 'aws-cdk-lib/aws-lambda'
 import { LambdaRestApi } from 'aws-cdk-lib/aws-apigateway'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { Bucket, BlockPublicAccess } from 'aws-cdk-lib/aws-s3';
+import { Bucket, BlockPublicAccess, ObjectOwnership } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Distribution, ViewerProtocolPolicy, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import * as origins from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -27,12 +27,15 @@ export class PulseCheckBackendStack extends Stack {
       handler: apiHandler,
     })
 
-    // Create an S3 bucket to host the React app
     const websiteBucket = new Bucket(this, 'PulseCheckBucket', {
       autoDeleteObjects: true,
+      enforceSSL: true,
       removalPolicy: RemovalPolicy.DESTROY,
       websiteIndexDocument: 'index.html',
+      minimumTLSVersion: 1.3,
+      objectOwnership: ObjectOwnership.BUCKET_OWNER_ENFORCED,
       blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+      // publicReadAccess: true,
     });
 
     // Deploy React app to S3
@@ -41,24 +44,24 @@ export class PulseCheckBackendStack extends Stack {
       destinationBucket: websiteBucket,
     });
 
-    // Create a CloudFront Origin Access Identity
-    const originAccessIdentity = new OriginAccessIdentity(this, 'OAI');
+    // // Create a CloudFront Origin Access Identity
+    // const originAccessIdentity = new OriginAccessIdentity(this, 'OAI');
 
-    // Grant CloudFront access to the S3 bucket
-    websiteBucket.grantRead(originAccessIdentity);
+    // // Grant CloudFront access to the S3 bucket
+    // websiteBucket.grantRead(originAccessIdentity);
 
-    // Create a CloudFront distribution to serve the React app
-    const distribution = new Distribution(this, 'PulseCheckDistribution', {
-      defaultBehavior: {
-        origin: origins.S3BucketOrigin.withOriginAccessIdentity(websiteBucket, { originAccessIdentity }),
-        viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-      },
-      defaultRootObject: 'index.html',
-    });
+    // // Create a CloudFront distribution to serve the React app
+    // const distribution = new Distribution(this, 'PulseCheckDistribution', {
+    //   defaultBehavior: {
+    //     origin: origins.S3BucketOrigin.withOriginAccessIdentity(websiteBucket, { originAccessIdentity }),
+    //     viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+    //   },
+    //   defaultRootObject: 'index.html',
+    // });
 
-    // Output the CloudFront URL
-    new CfnOutput(this, 'PulseCheckDistributionDomainName', {
-      value: distribution.distributionDomainName,
-    });
+    // // Output the CloudFront URL
+    // new CfnOutput(this, 'PulseCheckDistributionDomainName', {
+    //   value: distribution.distributionDomainName,
+    // });
   }
 }
