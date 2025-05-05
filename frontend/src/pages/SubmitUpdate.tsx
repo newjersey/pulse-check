@@ -7,13 +7,13 @@ export default function () {
   const [projects, setProjects] = useState<{ ID: string, "Needs intervention": string | number }[]>()
 
   function submit() {
-
+    console.log('submitted')
   }
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_ENDPOINT}/projects`); // Replace with your backend URL
+        const response = await fetch(`${import.meta.env.VITE_ENDPOINT}/projects`, { headers: { Authorization: 'Basic ' + btoa(`username:password`) }});
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -32,7 +32,7 @@ export default function () {
   console.log(projects)
 
   return <PageTemplate title="Submit an update">
-    <form>
+    <form action={submit}>
       <label className="usa-label" htmlFor="projects">Project</label>
       <select className="usa-select" name="projects" id="projects">
         <option value="">- Select a project -</option>
@@ -51,6 +51,7 @@ export default function () {
       {/* Add any metrics */}
       {/* Add new metric type */}
       {/* Update description */}
+      <input type="submit"  className="usa-button" />
     </form>
   </PageTemplate>
 }
