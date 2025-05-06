@@ -45,8 +45,10 @@ pnpm install
 
 1. Install AWS CDK: `npm i -g cdk`
 1. `cd backend`
+1. Add AWS credentials to `~/.aws/credentials` or env
 1. `cdk bootstrap`
 1. `cdk deploy`
+1. Add env vars to lambda and bucket via AWS console
 
 ## Contributing
 

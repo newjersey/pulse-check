@@ -6,16 +6,18 @@ import { serve } from '@hono/node-server'
 import { cors } from 'hono/cors'
 import * as dotenv from "dotenv";
 import Airtable = require('airtable');
-import { getProjects, getUpdates } from './utils'
-
-const app = new Hono()
-app.use('*', cors({ origin: ['http://localhost:5173'] }))
-app.use(logger())
+import { getProjects } from './utils'
 
 const env = dotenv.config({ path: "./.env" }).parsed;
-
+const FRONTEND_URL = process.env.FRONTEND_URL || env?.FRONTEND_URL || ''
 const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || env?.BASIC_AUTH_USERNAME || '';
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || env?.BASIC_AUTH_PASSWORD || '';
+
+const app = new Hono()
+app.use('*', cors({ origin: [FRONTEND_URL] }))
+app.use(logger())
+
+
 app.use(
   '/*',
   basicAuth({

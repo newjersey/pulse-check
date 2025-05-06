@@ -1,5 +1,4 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { Navigate } from 'react-router';
 
 export type Project = {
   ID: string;
@@ -32,8 +31,8 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
   const [projects, setProjects] = useState<Project[]>([]) // consider setting by ID instead?
-  const [milestones, setMilestones] = useState<any[]>([])
-  const [milestoneUpdates, setMilestoneUpdates] = useState<any[]>([])
+  const [milestones] = useState<any[]>([])
+  const [milestoneUpdates] = useState<any[]>([])
   
   useEffect(() => {
     const fetchData = async () => {

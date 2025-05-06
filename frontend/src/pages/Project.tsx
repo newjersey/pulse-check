@@ -4,6 +4,8 @@ import PageTemplate from "../components/PageTemplate";
 export default function () {
   const { projectId } = useParams();
 
+  console.log(projectId)
+
   return <PageTemplate title="Project title">
     <label className="usa-label" htmlFor="input-type-text">Text input label</label>
     <input className="usa-input" id="input-type-text" name="input-type-text" />

@@ -10,8 +10,10 @@ export default function () {
       {projects && projects.map(u => (<div>
         <dt key={u["ID"]}>{`${u["Name"]}`}</dt>
         <dd>
-          <Link to={`/projects/${u["ID"]}/update`}>View {u["Name"]} details</Link>
-          <Link to={`/projects/${u["ID"]}/update`}>Add an update for {u["Name"]}</Link>
+          <div className='display-flex flex-column padding-y-2'>
+            <Link to={`/projects/${u["ID"]}/update`}>View {u["Name"]} details</Link>
+            <Link to={`/projects/${u["ID"]}/update`}>Add an update for {u["Name"]}</Link>
+          </div>
           </dd>
       </div>))}
     </dl>
