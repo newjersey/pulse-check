@@ -27,6 +27,8 @@ const { Provider } = DataContext;
 
 export const useDataContext = () => useContext(DataContext)
 
+const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.meta.env.VITE_ENDPOINT;
+
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
@@ -39,7 +41,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       try {
         const response = await fetch(
-          `${import.meta.env.VITE_ENDPOINT}/projects`,
+          `${apiURL}/projects`,
           { headers: { Authorization: 'Basic ' + authToken } }
         );
         if (!response.ok) {

@@ -14,9 +14,8 @@ const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || env?.BASIC_AUTH_U
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || env?.BASIC_AUTH_PASSWORD || '';
 
 const app = new Hono()
-app.use('*', cors({ origin: [FRONTEND_URL] }))
+app.use('/*', cors({ origin: [FRONTEND_URL] }))
 app.use(logger())
-
 
 app.use(
   '/*',
@@ -30,11 +29,7 @@ const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || env?.AIRTABLE_API_KEY |
 const AIRTABLE_BASE_ID = process.env.AIRTABLE_BASE_ID || env?.AIRTABLE_BASE_ID || '';
 const base = new Airtable({ apiKey: AIRTABLE_API_KEY }).base(AIRTABLE_BASE_ID);
 
-app.get('/', (c) => c.text('Hello API!'))
-
-// TODO update blockers etc
-// app.post('/updates', (c) => {
-// })
+app.get('/', c => c.text('Hello API!'))
 
 app.get('/projects', async c => {
   const projects = await getProjects(base);
