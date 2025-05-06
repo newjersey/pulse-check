@@ -2,7 +2,7 @@ import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import { Runtime, FunctionUrlAuthType } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { Bucket, BlockPublicAccess, ObjectOwnership, BucketAccessControl, BucketEncryption } from 'aws-cdk-lib/aws-s3';
+import { Bucket, BlockPublicAccess, ObjectOwnership, BucketAccessControl, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Distribution, ViewerProtocolPolicy, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
@@ -19,11 +19,13 @@ export class PulseCheckBackendStack extends Stack {
       enforceSSL: true,
       removalPolicy: RemovalPolicy.DESTROY,
       websiteIndexDocument: 'index.html',
+      websiteErrorDocument: 'index.html',
       minimumTLSVersion: 1.3,
       encryption: BucketEncryption.S3_MANAGED,
       // blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
       blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
       publicReadAccess: true,
+      cors: [{ allowedOrigins: ['*'], allowedMethods: [HttpMethods.GET] }]
     });
 
     // Deploy React app to S3
