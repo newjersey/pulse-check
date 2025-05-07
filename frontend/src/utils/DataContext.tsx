@@ -41,14 +41,14 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       try {
         const response = await fetch(
-          `${apiURL}/projects`,
+          `${apiURL}/api/projects`,
           { headers: { Authorization: 'Basic ' + authToken } }
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-        setProjects(result);
+        setProjects(result.data);
       } catch (error) {
         console.error(error);
       } finally {

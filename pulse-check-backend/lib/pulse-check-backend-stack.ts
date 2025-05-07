@@ -1,6 +1,6 @@
 import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Runtime, FunctionUrlAuthType } from 'aws-cdk-lib/aws-lambda'
+import { Runtime, FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
 import { Bucket, BlockPublicAccess, ObjectOwnership, BucketAccessControl, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
@@ -22,10 +22,9 @@ export class PulseCheckBackendStack extends Stack {
       websiteErrorDocument: 'index.html',
       minimumTLSVersion: 1.3,
       encryption: BucketEncryption.S3_MANAGED,
-      // blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
       publicReadAccess: true,
-      cors: [{ allowedOrigins: ['*'], allowedMethods: [HttpMethods.GET] }]
+      blockPublicAccess: BlockPublicAccess.BLOCK_ACLS,
+      cors: [{ allowedOrigins: ['*'], allowedMethods: [HttpMethods.GET, HttpMethods.HEAD] }]
     });
 
     // Deploy React app to S3
@@ -58,15 +57,20 @@ export class PulseCheckBackendStack extends Stack {
       entry: 'api/index.ts',
       handler: 'handler',
       runtime: Runtime.NODEJS_20_X,
+      // environment: {
+      //   // See https://github.com/newjersey/business-plurmit-drafter/blob/main/packages/backend/lib/backend-stack.ts
+      //   AIRTABLE_API_KEY: airtableApiKey,
+      // },
     })
 
     const apiUrl = apiHandler.addFunctionUrl({
-      authType: FunctionUrlAuthType.AWS_IAM,
+      authType: FunctionUrlAuthType.NONE,
+      cors: {
+        allowCredentials: true,
+        // allowedOrigins: [websiteBucket.bucketWebsiteUrl],
+        allowedOrigins: ["https://pulsecheckbackendstack-pulsecheckbucket390707aa-ravwp0vqnndq.s3.us-east-1.amazonaws.com"],
+        allowedHeaders: ["Content-Type", "Authorization", "Accept"],
+      },
     })
-
-    apiHandler.addPermission(
-      'PulseCheckPermission',
-      { principal: new ServicePrincipal('s3.amazonaws.com'), sourceArn: websiteBucket.bucketArn }
-    )
   }
 }

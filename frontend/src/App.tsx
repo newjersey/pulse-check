@@ -4,8 +4,20 @@ import './App.css'
 import SubmitUpdate from './pages/SubmitUpdate';
 import { DataContextProvider } from './utils/DataContext';
 import Login from './pages/Login';
+import { useEffect } from 'react';
 
 function App() {
+  const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.meta.env.VITE_ENDPOINT;
+  async function testApiAccess() {
+    const test = await fetch(
+      `${apiURL}/`,
+    );
+    console.log(await test.json())
+  }
+
+  useEffect(() => {
+    testApiAccess()
+  }, [])
   return (
     <DataContextProvider>
       <header className="usa-header usa-header--basic">
