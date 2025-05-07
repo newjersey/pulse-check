@@ -1,8 +1,9 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
 export type Project = {
-  ID: string;
+  id: string;
   Name: string;
+  Description: string;
 }
 
 export type DataContextType = {
@@ -12,6 +13,7 @@ export type DataContextType = {
   projects: Project[];
   milestones: any[];
   milestoneUpdates: any[];
+  getProject: Function;
 }
 
 const DataContext = createContext<DataContextType>({
@@ -21,6 +23,7 @@ const DataContext = createContext<DataContextType>({
   projects: [],
   milestones: [],
   milestoneUpdates: [],
+  getProject: () => {},
 });
 
 const { Provider } = DataContext;
@@ -33,22 +36,22 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
   const [projects, setProjects] = useState<Project[]>([]) // consider setting by ID instead?
-  const [milestones] = useState<any[]>([])
+  const [milestones, setMilestones] = useState<any[]>([])
   const [milestoneUpdates] = useState<any[]>([])
   
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
       setLoading(true);
       try {
         const response = await fetch(
-          `${apiURL}/api/projects`,
+          `${apiURL}/api/${endpoint}`,
           { headers: { Authorization: 'Basic ' + authToken } }
         );
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-        setProjects(result.data);
+        setData(result.data);
       } catch (error) {
         console.error(error);
       } finally {
@@ -56,11 +59,16 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       }
     };
     if (authToken) {
-      fetchData();
+      fetchData('projects', setProjects);
+      fetchData('milestones', setMilestones);
     }
   }, [authToken, setLoading, setProjects])
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects, milestones, milestoneUpdates }}>
+  function getProject(id: string) {
+    return projects.find(p => p.id === id)
+  }
+
+  return <Provider value={{ authToken, setAuthToken, loading, projects, milestones, milestoneUpdates, getProject }}>
     {children}
   </Provider>
 }

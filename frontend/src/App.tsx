@@ -5,6 +5,7 @@ import SubmitUpdate from './pages/SubmitUpdate';
 import { DataContextProvider } from './utils/DataContext';
 import Login from './pages/Login';
 import { useEffect } from 'react';
+import Project from './pages/Project';
 
 function App() {
   const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.meta.env.VITE_ENDPOINT;
@@ -33,8 +34,7 @@ function App() {
           <Route path="/login" element={<Login/>} />
           <Route path="/" element={<Projects/>} />
           <Route path="/projects" element={<Projects/>} />
-          <Route path="/projects/:projectId" element={<Projects/>} />
-          <Route path="/projects/:projectId" element={<Projects/>} />
+          <Route path="/projects/:projectId" element={<Project/>} />
           <Route path="/projects/:projectId/update" element={<SubmitUpdate  />} />
       </Routes>
       </main>

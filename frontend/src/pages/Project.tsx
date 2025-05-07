@@ -1,15 +1,15 @@
 import { useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
+import { useDataContext } from "../utils/DataContext";
 
 export default function () {
   const { projectId } = useParams();
+  const { getProject } = useDataContext();
+  const project = getProject(projectId)
 
   console.log(projectId)
 
-  return <PageTemplate title="Project title">
-    <label className="usa-label" htmlFor="input-type-text">Text input label</label>
-    <input className="usa-input" id="input-type-text" name="input-type-text" />
-    <label className="usa-label" htmlFor="input-type-text">Text input label</label>
-    <input className="usa-input" id="input-type-text" name="input-type-text" />
+  return <PageTemplate title={project.Name}>
+    <p>{project.Description}</p>
   </PageTemplate>
 }

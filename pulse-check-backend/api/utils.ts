@@ -1,13 +1,17 @@
 import { AirtableBase } from "airtable/lib/airtable_base";
 
-const tableNames = {
+export const tableNames = {
   PROJECTS: 'Projects',
+  MILESTONES: 'Milestones',
+  MILESTONE_UPDATES: 'Milestone updates'
 }
 
-export async function getProjects(base: AirtableBase) {
+type TableNameKey = keyof typeof tableNames;
+
+export async function getAllRecords(base: AirtableBase, tableName: TableNameKey, options?: object) {
   try {
-    const response = await base(tableNames.PROJECTS).select({
-      view: "Grid view",
+    const response = await base(tableNames[tableName]).select({
+      ...options,
     })
     const records: any = []
     await response.eachPage(function page(_records: any, fetchNextPage: Function) {
@@ -20,4 +24,10 @@ export async function getProjects(base: AirtableBase) {
   } catch (e) {
     console.log(e)
   }
+}
+
+
+export async function fetchLinkedRecords(base: AirtableBase, linkedRecordIds: string[], tableName: TableNameKey) {
+  const idsWithRequest = linkedRecordIds.map(id => `RECORD_ID() = '${id}'`).join(',')
+  return await getAllRecords(base, tableName, { filterByFormula: `OR(${idsWithRequest})` })
 }
