@@ -14,16 +14,18 @@ const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || env?.BASIC_AUTH_U
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || env?.BASIC_AUTH_PASSWORD || '';
 
 const app = new Hono()
-// https://github.com/honojs/hono/issues/3870
-// const corsConfig = {
-//   origin: (origin: any) => "*",
-//   allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PUT", "PATCH"],
-//   allowHeaders: ["Content-Type", "Authorization", "Accept"],
-//   exposeHeaders: ["Content-Length", "Content-Type"],
-//   maxAge: 900,
-//   credentials: true,
-// }
-// app.use('/*', cors(corsConfig))
+if (process.env.DEV || env?.DEV) {
+  // https://github.com/honojs/hono/issues/3870
+  const corsConfig = {
+      origin: FRONTEND_URL,
+      allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PUT", "PATCH"],
+      allowHeaders: ["Content-Type", "Authorization", "Accept"],
+      exposeHeaders: ["Content-Length", "Content-Type"],
+      maxAge: 900,
+      credentials: true,
+    }
+    app.use('/*', cors(corsConfig))
+}
 app.use(logger())
 
 app.use(

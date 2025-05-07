@@ -27,8 +27,7 @@ export class PulseCheckBackendStack extends Stack {
       cors: [{ allowedOrigins: ['*'], allowedMethods: [HttpMethods.GET, HttpMethods.HEAD] }]
     });
 
-    // Deploy React app to S3
-    const deployment = new BucketDeployment(this, 'PulseCheckDeployment', {
+    new BucketDeployment(this, 'PulseCheckDeployment', {
       sources: [Source.asset(join(__dirname, '../../frontend/dist'))],
       destinationBucket: websiteBucket,
     });
@@ -57,17 +56,20 @@ export class PulseCheckBackendStack extends Stack {
       entry: 'api/index.ts',
       handler: 'handler',
       runtime: Runtime.NODEJS_20_X,
-      // environment: {
-      //   // See https://github.com/newjersey/business-plurmit-drafter/blob/main/packages/backend/lib/backend-stack.ts
-      //   AIRTABLE_API_KEY: airtableApiKey,
-      // },
+      environment: {
+        AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY || "",
+        AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID || "",
+        AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID || "",
+        BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME || "",
+        BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD || "",
+        FRONTEND_URL: process.env.FRONTEND_URL || "",
+      }
     })
 
-    const apiUrl = apiHandler.addFunctionUrl({
+    apiHandler.addFunctionUrl({
       authType: FunctionUrlAuthType.NONE,
       cors: {
         allowCredentials: true,
-        // allowedOrigins: [websiteBucket.bucketWebsiteUrl],
         allowedOrigins: ["https://pulsecheckbackendstack-pulsecheckbucket390707aa-ravwp0vqnndq.s3.us-east-1.amazonaws.com"],
         allowedHeaders: ["Content-Type", "Authorization", "Accept"],
       },
