@@ -1,9 +1,12 @@
 import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
+export type Milestone = { id: string, Title: string }
+
 export type Project = {
   id: string;
   Name: string;
   Description: string;
+  milestones?: Milestone[];
 }
 
 export type DataContextType = {
@@ -11,9 +14,7 @@ export type DataContextType = {
   setAuthToken: Function;
   loading: Boolean;
   projects: Project[];
-  milestones: any[];
-  milestoneUpdates: any[];
-  getProject: Function;
+  getProject: (id: string | undefined) => Project | undefined;
 }
 
 const DataContext = createContext<DataContextType>({
@@ -21,9 +22,7 @@ const DataContext = createContext<DataContextType>({
   setAuthToken: () => {},
   loading: false,
   projects: [],
-  milestones: [],
-  milestoneUpdates: [],
-  getProject: () => {},
+  getProject: () => undefined,
 });
 
 const { Provider } = DataContext;
@@ -36,8 +35,6 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
   const [projects, setProjects] = useState<Project[]>([]) // consider setting by ID instead?
-  const [milestones, setMilestones] = useState<any[]>([])
-  const [milestoneUpdates] = useState<any[]>([])
   
   useEffect(() => {
     const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
@@ -60,15 +57,14 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     };
     if (authToken) {
       fetchData('projects', setProjects);
-      fetchData('milestones', setMilestones);
     }
   }, [authToken, setLoading, setProjects])
 
-  function getProject(id: string) {
-    return projects.find(p => p.id === id)
+  function getProject(id: string | undefined): Project | undefined {
+    return projects?.find(p => p.id === id)
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects, milestones, milestoneUpdates, getProject }}>
+  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject }}>
     {children}
   </Provider>
 }

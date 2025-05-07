@@ -4,7 +4,6 @@ import { useDataContext } from '../utils/DataContext';
 
 export default function () {
   const { projects } = useDataContext();
-  console.log(projects)
 
   return <PageTemplate title="Projects">
     <dl>

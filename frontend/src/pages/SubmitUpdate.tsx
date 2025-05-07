@@ -3,12 +3,18 @@ import PageTemplate from "../components/PageTemplate";
 import { useDataContext } from "../utils/DataContext";
 
 export default function () {
-  const { projects, getProject } = useDataContext();
+  const { projects, getProject, loading } = useDataContext();
   const { projectId } = useParams();
   const project = getProject(projectId)
 
   function submit() {
     console.log('submitted')
+  }
+
+  if (loading || !project) {
+    return <PageTemplate title="Loading project...">
+      <></>
+    </PageTemplate>
   }
 
   return <PageTemplate title={`Submit an update for ${project.Name}`}>
@@ -27,7 +33,7 @@ export default function () {
       {/* Add any metrics */}
       {/* Add new metric type */}
       {/* Update description */}
-      <input type="submit"  className="usa-button" />
+      <input type="submit" className="usa-button" />
     </form>
   </PageTemplate>
 }
