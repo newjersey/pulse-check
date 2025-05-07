@@ -1,13 +1,10 @@
-import { Stack, StackProps, CfnOutput, RemovalPolicy } from 'aws-cdk-lib';
+import { Stack, StackProps, RemovalPolicy } from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { Runtime, FunctionUrlAuthType, HttpMethod } from 'aws-cdk-lib/aws-lambda'
+import { Runtime, FunctionUrlAuthType } from 'aws-cdk-lib/aws-lambda'
 import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
-import { Bucket, BlockPublicAccess, ObjectOwnership, BucketAccessControl, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
+import { Bucket, BlockPublicAccess, BucketEncryption, HttpMethods } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
-import { Distribution, ViewerProtocolPolicy, OriginAccessIdentity } from 'aws-cdk-lib/aws-cloudfront';
-import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { join } from 'path';
-import { ArnPrincipal, ServicePrincipal } from 'aws-cdk-lib/aws-iam';
 
 
 export class PulseCheckBackendStack extends Stack {
@@ -32,38 +29,10 @@ export class PulseCheckBackendStack extends Stack {
       destinationBucket: websiteBucket,
     });
 
-    // // Create a CloudFront Origin Access Identity
-    // const originAccessIdentity = new OriginAccessIdentity(this, 'OAI');
-
-    // // Grant CloudFront access to the S3 bucket
-    // websiteBucket.grantRead(originAccessIdentity);
-
-    // Create a CloudFront distribution to serve the React app
-    // const distribution = new Distribution(this, 'PulseCheckDistribution', {
-    //   defaultBehavior: {
-    //     origin: S3BucketOrigin.withOriginAccessIdentity(websiteBucket, { originAccessIdentity }),
-    //     viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
-    //   },
-    //   defaultRootObject: 'index.html',
-    // });
-
-    // // Output the CloudFront URL
-    // new CfnOutput(this, 'PulseCheckDistributionDomainName', {
-    //   value: distribution.distributionDomainName,
-    // });
-
     const apiHandler = new NodejsFunction(this, 'PulseCheckHandler', {
       entry: 'api/index.ts',
       handler: 'handler',
       runtime: Runtime.NODEJS_20_X,
-      environment: {
-        AIRTABLE_API_KEY: process.env.AIRTABLE_API_KEY || "",
-        AIRTABLE_BASE_ID: process.env.AIRTABLE_BASE_ID || "",
-        AWS_ACCOUNT_ID: process.env.AWS_ACCOUNT_ID || "",
-        BASIC_AUTH_USERNAME: process.env.BASIC_AUTH_USERNAME || "",
-        BASIC_AUTH_PASSWORD: process.env.BASIC_AUTH_PASSWORD || "",
-        FRONTEND_URL: process.env.FRONTEND_URL || "",
-      }
     })
 
     apiHandler.addFunctionUrl({

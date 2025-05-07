@@ -14,6 +14,8 @@ const BASIC_AUTH_USERNAME = process.env.BASIC_AUTH_USERNAME || env?.BASIC_AUTH_U
 const BASIC_AUTH_PASSWORD = process.env.BASIC_AUTH_PASSWORD || env?.BASIC_AUTH_PASSWORD || '';
 
 const app = new Hono()
+
+
 if (process.env.DEV || env?.DEV) {
   // https://github.com/honojs/hono/issues/3870
   const corsConfig = {
@@ -26,6 +28,7 @@ if (process.env.DEV || env?.DEV) {
     }
     app.use('/*', cors(corsConfig))
 }
+
 app.use(logger())
 
 app.use(
@@ -34,7 +37,6 @@ app.use(
     username: BASIC_AUTH_USERNAME,
     password: BASIC_AUTH_PASSWORD,
   }),
-  // cors(corsConfig)
 )
 
 const AIRTABLE_API_KEY = process.env.AIRTABLE_API_KEY || env?.AIRTABLE_API_KEY || '';
@@ -49,8 +51,6 @@ app.get('/api/projects', async c => {
   const projects = await getProjects(base);
   return c.json({ data: projects, status: 200 });
 })
-
-// app.get('/projects/:id', (c) => c.text('Get project!'))
 
 serve({ fetch: app.fetch, port: 3001 })
 
