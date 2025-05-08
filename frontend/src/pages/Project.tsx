@@ -15,8 +15,7 @@ export default function () {
 
   return <PageTemplate title={project.Name}>
     <p>{project.Description}</p>
-    <h2>Milestones</h2>
-    <table>
+    <table className="usa-table usa-table--borderless">
       <thead>
         <tr>
           <th>Milestone</th>
@@ -26,12 +25,15 @@ export default function () {
         </tr>
       </thead>
       {project.Milestones?.map((m) => (
-        m["Milestone updates"] || [{ Status: '' }]).map((u, idx) => (
+        m["Milestone updates"] || [{ Status: '', id: m.id }]).map((u, idx) => (
           <tr key={u.id}>
             <td>
-              <span className={idx === 0 ? undefined : 'usa-sr-only'}>
+              <p className={idx === 0 ? 'text-bold margin-0' : 'usa-sr-only'}>
                 {m.Title}
-              </span>
+              </p>
+              {idx === 0 && <p className="margin-0">
+                {m.Description}
+                </p>}
             </td>
             <td>
               {u['Created']}
