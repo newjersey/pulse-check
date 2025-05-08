@@ -7,7 +7,7 @@ import { cors } from 'hono/cors'
 import { cache } from 'hono/cache'
 import * as dotenv from "dotenv";
 import Airtable = require('airtable');
-import { fetchLinkedRecords, getAllRecords, tableNames } from './utils'
+import { fetchLinkedRecords, getAllRecords } from './utils'
 
 const env = dotenv.config({ path: "./.env" }).parsed;
 const FRONTEND_URL = process.env.FRONTEND_URL || env?.FRONTEND_URL || ''
@@ -59,12 +59,14 @@ app.get('/', c => {
 app.get('/api/projects', async c => {
   const projects = await getAllRecords(base, 'PROJECTS', { view: "Grid view" });
   const projectsWithMilestones = await Promise.all(projects.map(async (p: { [x: string]: any }) => {
-    const milestoneIds: string[] = p.Milestones
-    if (!milestoneIds) {
-      return p;
+    const withMilestones = await fetchLinkedRecords(base, p, 'MILESTONES');
+    if (withMilestones.Milestones) {
+      const milestoneWithUpdates = await Promise.all(withMilestones.Milestones.map(async (m: { [key: string]: any }) => (
+        await fetchLinkedRecords(base, m, 'MILESTONE_UPDATES')
+      )))
+      withMilestones.Milestones = milestoneWithUpdates
     }
-    const milestones = await fetchLinkedRecords(base, milestoneIds, 'MILESTONES');
-    return { ...p, milestones }
+    return withMilestones
   }))
   return c.json({ data: projectsWithMilestones, status: 200 });
 })

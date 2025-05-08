@@ -17,8 +17,15 @@ export default function () {
     <p>{project.Description}</p>
     <h2>Milestones</h2>
     <ul>
-      {project.milestones?.map((m) => (<li key={m.id}>
+      {project.Milestones?.map((m) => (<li key={m.id}>
         {m.Title}
+        {m['Milestone updates'] && <ul>
+          {m['Milestone updates'].map(mu => (
+            <li>
+              {mu['Status']}
+            </li>
+          ))}
+          </ul>}
       </li>))}
     </ul>
   </PageTemplate>

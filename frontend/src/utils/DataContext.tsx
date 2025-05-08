@@ -1,12 +1,24 @@
 import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
-export type Milestone = { id: string, Title: string }
+export type MilestoneUpdate = {
+  id: string;
+  ID: string;
+  Created: string;
+  Description: string;
+  Status: string;
+}
+
+export type Milestone = {
+  id: string;
+  Title: string;
+  'Milestone updates'?: MilestoneUpdate[]
+}
 
 export type Project = {
   id: string;
   Name: string;
   Description: string;
-  milestones?: Milestone[];
+  Milestones?: Milestone[];
 }
 
 export type DataContextType = {
