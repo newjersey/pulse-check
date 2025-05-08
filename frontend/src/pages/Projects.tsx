@@ -1,21 +1,58 @@
 import PageTemplate from '../components/PageTemplate';
 import { Link } from 'react-router';
-import { useDataContext } from '../utils/DataContext';
+import { Milestone, MilestoneUpdate, MilestoneUpdateStatus, Project, statusValues, useDataContext } from '../utils/DataContext';
 
 export default function () {
   const { projects } = useDataContext();
 
+  function getMostRecentMilestoneUpdates(project: Project): (Milestone & { mostRecentUpdate?: MilestoneUpdate})[] | undefined {
+    return project.Milestones?.map(m => {
+      const mostRecentUpdate = m['Milestone updates']?.[0];
+      if (!mostRecentUpdate) {
+        return m
+      }
+      return ({
+        ...m,
+        mostRecentUpdate, // sorted server side
+      })
+    })
+  }
+
+  type StatusCount = {
+    [key in MilestoneUpdateStatus]: number
+  }
+  function getStatusCountForMostRecentMilestoneUpdates(project: Project): StatusCount {
+    const statusCounts: StatusCount = Object.fromEntries(statusValues.map((_, i) => [statusValues[i], 0]))
+    const mostRecentUpdates = getMostRecentMilestoneUpdates(project);
+    mostRecentUpdates?.forEach(milestone => {
+      const update = milestone.mostRecentUpdate
+      const udpateStatus = update?.Status
+      if (!udpateStatus) {
+        return
+      }
+      statusCounts[udpateStatus] += 1
+    })
+    return statusCounts
+  }
+
   return <PageTemplate title="Projects">
     <dl>
-      {projects && projects.map(u => (<div key={u["id"]}>
-        <dt>{`${u["Name"]}`}</dt>
-        <dd>
-          <div className='display-flex flex-column padding-y-2'>
-            <Link to={`/projects/${u["id"]}`}>View {u["Name"]} details</Link>
-            <Link to={`/projects/${u["id"]}/update`}>Add an update for {u["Name"]}</Link>
-          </div>
+      {projects && projects.map(project => {
+        const statusCounts = getStatusCountForMostRecentMilestoneUpdates(project)
+        return (
+        <div key={project["id"]} className='display-flex padding-y-2'>
+          <dt className='flex-1'>{`${project["Name"]}`}</dt>
+          <dd className='flex-2'>
+            {Object.keys(statusCounts).map((s) => (
+              <div>{s}: {statusCounts[s as MilestoneUpdateStatus]}</div>
+            ))}
+            <div className='display-flex flex-column'>
+              <Link to={`/projects/${project["id"]}`}>View {project["Name"]} details</Link>
+              <Link to={`/projects/${project["id"]}/update`}>Add an update for {project["Name"]}</Link>
+            </div>
           </dd>
-      </div>))}
+        </div>)
+      })}
     </dl>
   </PageTemplate>
 }

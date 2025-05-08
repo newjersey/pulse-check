@@ -57,12 +57,14 @@ app.get('/', c => {
 })
 
 app.get('/api/projects', async c => {
-  const projects = await getAllRecords(base, 'PROJECTS', { view: "Grid view" });
+  const projects = await getAllRecords(base, 'PROJECTS', { view: "Grid view", sort: [{ field: "Name", direction: "asc" }] });
   const projectsWithMilestones = await Promise.all(projects.map(async (p: { [x: string]: any }) => {
     const withMilestones = await fetchLinkedRecords(base, p, 'MILESTONES');
     if (withMilestones.Milestones) {
       const milestoneWithUpdates = await Promise.all(withMilestones.Milestones.map(async (m: { [key: string]: any }) => (
-        await fetchLinkedRecords(base, m, 'MILESTONE_UPDATES')
+        await fetchLinkedRecords(base, m, 'MILESTONE_UPDATES', {
+          sort: [{ field: "Created", direction: "desc" }]
+        })
       )))
       withMilestones.Milestones = milestoneWithUpdates
     }

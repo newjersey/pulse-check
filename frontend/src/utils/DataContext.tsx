@@ -1,11 +1,21 @@
 import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
 
+export const statusValues = [
+  "Backlog/planning",
+  "In progress",
+  "Done",
+  "Blocked",
+  "Canceled"
+]
+type StatusValues = typeof statusValues;
+export type MilestoneUpdateStatus = StatusValues[number]
+
 export type MilestoneUpdate = {
   id: string;
   ID: string;
   Created: string;
   Description: string;
-  Status: string;
+  Status: MilestoneUpdateStatus;
 }
 
 export type Milestone = {

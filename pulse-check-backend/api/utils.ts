@@ -26,13 +26,19 @@ export async function getAllRecords(base: AirtableBase, tableName: TableNameKey,
   }
 }
 
-export async function fetchLinkedRecords(base: AirtableBase, originalRecord: { [key: string]: any }, tableName: TableNameKey) {
+export async function fetchLinkedRecords(base: AirtableBase, originalRecord: { [key: string]: any }, tableName: TableNameKey, options?: object) {
   const nameKey = tableNames[tableName];
   const linkedRecordIds = originalRecord[nameKey] as string[]
   if (!linkedRecordIds) {
     return originalRecord;
   }
   const idsWithRequest = linkedRecordIds.map(id => `RECORD_ID() = '${id}'`).join(',')
-  originalRecord[nameKey] = await getAllRecords(base, tableName, { filterByFormula: `OR(${idsWithRequest})` })
+  originalRecord[nameKey] = await getAllRecords(
+    base,
+    tableName,
+    {
+      ...options,
+      filterByFormula: `OR(${idsWithRequest})`
+    })
   return originalRecord
 }
