@@ -16,17 +16,35 @@ export default function () {
   return <PageTemplate title={project.Name}>
     <p>{project.Description}</p>
     <h2>Milestones</h2>
-    <ul>
-      {project.Milestones?.map((m) => (<li key={m.id}>
-        {m.Title}
-        {m['Milestone updates'] && <ul>
-          {m['Milestone updates'].map(mu => (
-            <li>
-              {mu['Status']}
-            </li>
-          ))}
-          </ul>}
-      </li>))}
-    </ul>
+    <table>
+      <thead>
+        <tr>
+          <th>Milestone</th>
+          <th>Date last updated</th>
+          <th>Update</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      {project.Milestones?.map((m) => (
+        m["Milestone updates"] || [{ Status: '' }]).map((u, idx) => (
+          <tr key={u.id}>
+            <td>
+              <span className={idx === 0 ? undefined : 'usa-sr-only'}>
+                {m.Title}
+              </span>
+            </td>
+            <td>
+              {u['Created']}
+            </td>
+            <td>
+              {u['Description']}
+            </td>
+            <td>
+              {u['Status']}
+            </td>
+          </tr>
+        )
+        ))}
+    </table>
   </PageTemplate>
 }
