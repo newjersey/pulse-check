@@ -25,10 +25,21 @@ export type Milestone = {
   'Milestone updates'?: MilestoneUpdate[]
 }
 
+export const projectPhaseValues = [
+  "Discovery",
+  "Prototype ",
+  "Launch",
+  "Maintain",
+  "Handoff",
+  "Intake",
+  "Sunset"
+]
+type ProjectPhaseValues = typeof projectPhaseValues;
 export type Project = {
   id: string;
   Name: string;
   Description: string;
+  Phase: ProjectPhaseValues[number];
   Milestones?: Milestone[];
 }
 
