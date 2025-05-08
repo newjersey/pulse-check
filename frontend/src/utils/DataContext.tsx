@@ -21,6 +21,7 @@ export type MilestoneUpdate = {
 export type Milestone = {
   id: string;
   Title: string;
+  Description: string;
   'Milestone updates'?: MilestoneUpdate[]
 }
 

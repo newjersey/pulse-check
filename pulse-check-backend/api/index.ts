@@ -7,7 +7,7 @@ import { cors } from 'hono/cors'
 import { cache } from 'hono/cache'
 import * as dotenv from "dotenv";
 import Airtable = require('airtable');
-import { fetchLinkedRecords, getAllRecords } from './utils'
+import { fetchLinkedRecords, getAllRecords, tableNames } from './utils'
 
 const env = dotenv.config({ path: "./.env" }).parsed;
 const FRONTEND_URL = process.env.FRONTEND_URL || env?.FRONTEND_URL || ''
@@ -56,20 +56,26 @@ app.get('/', c => {
   return c.json({ message: 'Hello API!', status: 200 })
 })
 
+type AirtableRecord = { [x: string]: any }
 app.get('/api/projects', async c => {
-  const projects = await getAllRecords(base, 'PROJECTS', { view: "Grid view", sort: [{ field: "Name", direction: "asc" }] });
-  const projectsWithMilestones = await Promise.all(projects.map(async (p: { [x: string]: any }) => {
-    const withMilestones = await fetchLinkedRecords(base, p, 'MILESTONES');
-    if (withMilestones.Milestones) {
-      const milestoneWithUpdates = await Promise.all(withMilestones.Milestones.map(async (m: { [key: string]: any }) => (
-        await fetchLinkedRecords(base, m, 'MILESTONE_UPDATES', {
-          sort: [{ field: "Created", direction: "desc" }]
-        })
-      )))
-      withMilestones.Milestones = milestoneWithUpdates
-    }
-    return withMilestones
-  }))
+  const projects = await getAllRecords(base, 'PROJECTS', { sort: [{ field: "Name", direction: "asc" }] });
+
+  const projectsWithMilestones = await Promise.all(
+    projects.map(async (p: AirtableRecord) => {
+      const withMilestones = await fetchLinkedRecords(base, p, 'MILESTONES');
+      const hasUpdates = (withMilestones.Milestones || []).some((m: AirtableRecord) => m[tableNames['MILESTONE_UPDATES']])
+
+      if (hasUpdates) {
+        withMilestones.Milestones = await Promise.all(withMilestones.Milestones.map(
+          async (m: AirtableRecord) => await fetchLinkedRecords(base, m, 'MILESTONE_UPDATES', { sort: [{ field: "Created", direction: "desc" }] }
+          )
+        ))
+      }
+
+      return withMilestones
+    })
+  )
+
   return c.json({ data: projectsWithMilestones, status: 200 });
 })
 
