@@ -2,16 +2,31 @@ import { useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
 import { useDataContext } from "../utils/DataContext";
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
+import { useEffect, useState } from "react";
 
 export default function () {
   const { projectId } = useParams();
   const { getProject, loading } = useDataContext();
   const project = getProject(projectId)
+  const [milestonesToggled, setMilestonesToggled] = useState<{ [key: string]: { expanded: boolean } }>()
+
+  useEffect(() => {
+    const milestonesById = project?.Milestones?.reduce((o, { id, ...milestone }) => ({ ...o, [id]: { ...milestone, expanded: false } }), {})
+    setMilestonesToggled(milestonesById)
+  }, [project])
 
   if (loading || !project) {
     return <PageTemplate title="Loading project...">
       <></>
     </PageTemplate>
+  }
+
+  function toggleMilestone(id: string) {
+    const milestone = milestonesToggled?.[id]
+    if (!milestone) {
+      return
+    }
+    setMilestonesToggled({ ...milestonesToggled, [id]: { ...milestone, expanded: !milestone.expanded } })
   }
 
   return <PageTemplate title={project.Name}>
@@ -29,20 +44,36 @@ export default function () {
         <tbody>
           {/* TODO https://dequeuniversity.com/class/semantic-structure-wcag-2.2/tables/complex */}
           {project.Milestones.map((m) => (
-            m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates yet' }]).map((u, idx, updates) => (
-              <tr key={u.id}>
-                {idx === 0 && <th scope="row" rowSpan={updates.length}>
-                  <div className="display-flex">
-                    {idx === 0 && <button className="bg-transparent cursor-pointer text-black display-flex flex-align-center border-0 flex-column flex-justify-center margin-left-neg-6 margin-right-1">
+            m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates yet' }]).map((u, idx, updates) => {
+              const expanded = milestonesToggled?.[m.id]?.expanded
+              let tdStyleOverride = {}
+              if (idx > 0 && !expanded) {
+                return
+              }
+              if (expanded && updates.length > 1) {
+                tdStyleOverride = {
+                  borderTop: 'none',
+                  borderBottom: 'none',
+                }
+              }
+              return (<tr key={u.id}>
+                {idx === 0 && <th scope="row" rowSpan={expanded ? updates.length : 1} style={{ verticalAlign: 'top' }}>
+                  <div className="display-flex flex-1">
+                    {updates.length > 1 && <button
+                      onClick={() => toggleMilestone(m.id)}
+                      className="bg-transparent cursor-pointer text-black display-flex flex-align-center border-0 flex-column flex-justify-center margin-left-neg-6 margin-right-1"
+                    >
                       <span className="usa-button usa-sr-only">
                         {m.Title} Details
                       </span>
-                      <svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use href={`${imageUrl}#unfold_more`}></use>
-                      </svg>
-                      <svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
-                        <use href={`${imageUrl}#unfold_less`}></use>
-                      </svg>
+                      {!expanded ?
+                        (<svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
+                          <use href={`${imageUrl}#unfold_more`}></use>
+                        </svg>) :
+                        (<svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
+                          <use href={`${imageUrl}#unfold_less`}></use>
+                        </svg>)
+                      }
                     </button>}
 
                     <div className="display-flex flex-column">
@@ -55,17 +86,17 @@ export default function () {
                     </div>
                   </div>
                 </th>}
-                <td>
+                <td style={tdStyleOverride}>
                   {u['Created']}
                 </td>
-                <td>
+                <td style={tdStyleOverride}>
                   {u['Description']}
                 </td>
-                <td>
+                <td style={tdStyleOverride}>
                   {u['Status']}
                 </td>
               </tr>)
-            ))}
+            }))}
         </tbody>
       </table>) : <p>No milestones added yet</p>}
   </PageTemplate>
