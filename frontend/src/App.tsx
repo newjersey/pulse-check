@@ -1,4 +1,4 @@
-import { Routes, Route, Link } from 'react-router';
+import { Routes, Route, Link, useLocation } from 'react-router';
 import Projects from './pages/Projects';
 import './App.css'
 import SubmitUpdate from './pages/SubmitUpdate';
@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Project from './pages/Project';
 
 function App() {
+  const { pathname, search } = useLocation()
   return (
     <DataContextProvider>
       <header className="usa-header usa-header--basic">
@@ -17,16 +18,22 @@ function App() {
               <Link to="/" className="usa-logo__text">Resx dashboard</Link>
             </div>
           </div>
+          {(pathname === '/' || pathname === '/projects') && <nav className='usa-nav'>
+            {search === '?view=timeline' ?
+              <Link to={{ pathname: "/projects", search: "" }}>Status view</Link> :
+              <Link to={{ pathname: "/projects", search: "?view=timeline" }}>Timeline view</Link>
+            }
+          </nav>}
         </div>
       </header>
       <main id="main-content" className="grid-container">
         <Routes>
-          <Route path="/login" element={<Login/>} />
-          <Route path="/" element={<Projects/>} />
-          <Route path="/projects" element={<Projects/>} />
-          <Route path="/projects/:projectId" element={<Project/>} />
-          <Route path="/projects/:projectId/update" element={<SubmitUpdate  />} />
-      </Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Projects />} />
+          <Route path="/projects" element={<Projects />} />
+          <Route path="/projects/:projectId" element={<Project />} />
+          <Route path="/projects/:projectId/update" element={<SubmitUpdate />} />
+        </Routes>
       </main>
     </DataContextProvider>
   )
