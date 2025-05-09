@@ -15,40 +15,40 @@ export default function () {
 
   return <PageTemplate title={project.Name}>
     <p>{project.Description}</p>
-    <table className="usa-table usa-table--borderless">
-      <thead>
-        <tr>
-          <th>Milestone</th>
-          <th>Date last updated</th>
-          <th>Update</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {project.Milestones?.map((m) => (
-          m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates found' }]).map((u, idx) => (
-            <tr key={u.id}>
-              <td>
-                <p className={idx === 0 ? 'text-bold margin-0' : 'usa-sr-only'}>
-                  {m.Title}
-                </p>
-                {idx === 0 && <p className="margin-0">
-                  {m.Description}
-                </p>}
-              </td>
-              <td>
-                {u['Created']}
-              </td>
-              <td>
-                {u['Description']}
-              </td>
-              <td>
-                {u['Status']}
-              </td>
-            </tr>
-          )
-          ))}
-      </tbody>
-    </table>
+    {project.Milestones ? (
+      <table className="usa-table usa-table--borderless">
+        <thead>
+          <tr>
+            <th>Milestone</th>
+            <th>Date last updated</th>
+            <th>Update</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {project.Milestones.map((m) => (
+            m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates yet' }]).map((u, idx) => (
+              <tr key={u.id}>
+                <td>
+                  <p className={idx === 0 ? 'text-bold margin-0' : 'usa-sr-only'}>
+                    {m.Title}
+                  </p>
+                  {idx === 0 && <p className="margin-0">
+                    {m.Description}
+                  </p>}
+                </td>
+                <td>
+                  {u['Created']}
+                </td>
+                <td>
+                  {u['Description']}
+                </td>
+                <td>
+                  {u['Status']}
+                </td>
+              </tr>)
+            ))}
+        </tbody>
+      </table>) : <p>No milestones added yet</p>}
   </PageTemplate>
 }

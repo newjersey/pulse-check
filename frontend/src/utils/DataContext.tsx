@@ -3,8 +3,9 @@ import { createContext, ReactNode, SetStateAction, useContext, useEffect, useSta
 export const statusValues = [
   "Backlog/planning",
   "In progress",
-  "Done",
+  "At risk",
   "Blocked",
+  "Done",
   "Canceled"
 ]
 type StatusValues = typeof statusValues;
