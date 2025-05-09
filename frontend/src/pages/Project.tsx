@@ -24,29 +24,31 @@ export default function () {
           <th>Status</th>
         </tr>
       </thead>
-      {project.Milestones?.map((m) => (
-        m["Milestone updates"] || [{ Status: '', id: m.id }]).map((u, idx) => (
-          <tr key={u.id}>
-            <td>
-              <p className={idx === 0 ? 'text-bold margin-0' : 'usa-sr-only'}>
-                {m.Title}
-              </p>
-              {idx === 0 && <p className="margin-0">
-                {m.Description}
+      <tbody>
+        {project.Milestones?.map((m) => (
+          m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates found' }]).map((u, idx) => (
+            <tr key={u.id}>
+              <td>
+                <p className={idx === 0 ? 'text-bold margin-0' : 'usa-sr-only'}>
+                  {m.Title}
+                </p>
+                {idx === 0 && <p className="margin-0">
+                  {m.Description}
                 </p>}
-            </td>
-            <td>
-              {u['Created']}
-            </td>
-            <td>
-              {u['Description']}
-            </td>
-            <td>
-              {u['Status']}
-            </td>
-          </tr>
-        )
-        ))}
+              </td>
+              <td>
+                {u['Created']}
+              </td>
+              <td>
+                {u['Description']}
+              </td>
+              <td>
+                {u['Status']}
+              </td>
+            </tr>
+          )
+          ))}
+      </tbody>
     </table>
   </PageTemplate>
 }
