@@ -1,60 +1,15 @@
 import { Link } from "react-router";
-import { Milestone, MilestoneUpdate, MilestoneUpdateStatus, Project } from "../utils/DataContext";
+import { Project } from "../utils/DataContext";
+import { scaleTime } from "d3-scale";
 
 export default function ({ project }: { project: Project }) {
-  function getMostRecentMilestoneUpdates(project: Project): (Milestone & { mostRecentUpdate?: MilestoneUpdate })[] | undefined {
-    return project.Milestones?.map(m => {
-      const mostRecentUpdate = m['Milestone updates']?.[0];
-      if (!mostRecentUpdate) {
-        return m
-      }
-      return ({
-        ...m,
-        mostRecentUpdate, // sorted server side
-      })
-    })
-  }
+  const currentDate = new Date();
+  const oneMonthAgo = new Date(currentDate);
+  oneMonthAgo.setMonth(currentDate.getMonth() - 1)
+  
 
-  type StatusCount = {
-    [key in MilestoneUpdateStatus]: {
-      class: string,
-      value: number
-    }
-  }
-  const usedStatusValues = {
-    "Done": {
-      class: 'usa-alert--success',
-      value: 0
-    },
-    "In progress": {
-      class: "usa-alert--info",
-      value: 0
-    },
-    "At risk": {
-      class: "usa-alert--warning",
-      value: 0
-    },
-    "Blocked": {
-      class: "usa-alert--error",
-      value: 0
-    }
-  }
-  function getStatusCountForMostRecentMilestoneUpdates(project: Project): StatusCount {
-    const statusCounts: StatusCount = Object.assign({}, usedStatusValues)
-    const mostRecentUpdates = getMostRecentMilestoneUpdates(project);
-    mostRecentUpdates?.forEach(milestone => {
-      const update = milestone.mostRecentUpdate
-      const udpateStatus = update?.Status
-      if (!udpateStatus) {
-        return
-      }
-      statusCounts[udpateStatus].value += 1
-    })
-    delete statusCounts['Backlog/planning']
-    return statusCounts
-  }
+  const getX = scaleTime([oneMonthAgo, currentDate], [200, 600]);
 
-  const statusCounts = getStatusCountForMostRecentMilestoneUpdates(project)
 
   return (<div className="grid-row margin-y-6 grid-gap">
     <div className="grid-col-3">
@@ -62,17 +17,21 @@ export default function ({ project }: { project: Project }) {
       <p className="margin-0">{project["Phase"]}</p>
     </div>
 
-    <div className="grid-col-8 display-flex flex-justify flex-align-stretch">
-      {Object.keys(statusCounts).map((s) => (
-        <div className={`usa-alert flex-1 margin-x-1 margin-y-0 padding-2 ${statusCounts[s].class}`} key={`${project.id}-${s}`}>
-          <div className="font-body-xl">
-            {statusCounts[s].value}
-          </div>
-          <div>{s}</div>
-        </div>
-      ))}
+    <div className="grid-col-8 display-flex flex-justify flex-align-stretch flex-column">
+      <svg height={`${(project.Milestones?.length || 0) * 40}px`} width="600" viewBox={`0 0 600 ${20 + 40 * (project.Milestones?.length || 0)}`}>
+        {project.Milestones?.map((m, idx, milestones) => {
+          const y = 10 + (idx + 1) * 40
+          return (<g>
+            <text y={y} x={0}>{m.Title}</text>
+            {m["Milestone updates"] && m["Milestone updates"]?.map((u, idx) => {
+              const x = getX(new Date(u.Created))
+              return <rect fill="red" y={y - 10} width={10} height={10} x={x}></rect>
+            })}
+          </g>)
+        })}
+      </svg>
     </div>
-    
+
     <div className='display-flex flex-column grid-col-1'>
       <Link to={`/projects/${project["id"]}`}>
         <span className="usa-sr-only">
