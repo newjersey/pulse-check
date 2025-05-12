@@ -58,6 +58,7 @@ export type DataContextType = {
   getProject: (id: string | undefined) => Project | undefined;
   getPerson: (id: string | undefined) => Person | undefined;
   people: Person[];
+  postData: (endpoint: string, data: any) => any;
 }
 
 const DataContext = createContext<DataContextType>({
@@ -68,6 +69,7 @@ const DataContext = createContext<DataContextType>({
   getProject: () => undefined,
   people: [],
   getPerson: () => undefined,
+  postData: () => {}
 });
 
 const { Provider } = DataContext;
@@ -81,6 +83,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState();
   const [projects, setProjects] = useState<Project[]>([])
   const [people, setPeople] = useState<Person[]>([])
+  const [refreshData, setRefreshData] = useState(false)
   
   useEffect(() => {
     const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
@@ -98,6 +101,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       } catch (error) {
         console.error(error);
       } finally {
+        setRefreshData(false);
         setLoading(false);
       }
     };
@@ -105,7 +109,29 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       fetchData('projects', setProjects);
       fetchData('people', setPeople);
     }
-  }, [authToken])
+  }, [authToken, refreshData])
+
+  async function postData(endpoint: string, data: any) {
+    setLoading(true)
+    try {
+      const response = await fetch(
+        `${apiURL}/api/${endpoint}`,
+        {
+          method: 'POST',
+          headers: { Authorization: 'Basic ' + authToken },
+          body: JSON.stringify(data)
+        }
+      );
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      setRefreshData(true);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function getProject(id: string | undefined): Project | undefined {
     return projects?.find(p => p.id === id)
@@ -115,7 +141,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     return people?.find(p => p.id === id)
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject, people, getPerson }}>
+  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject, people, getPerson, postData }}>
     {children}
   </Provider>
 }

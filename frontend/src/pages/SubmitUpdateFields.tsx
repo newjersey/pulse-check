@@ -4,7 +4,7 @@ import { useFormContext } from "../contexts/FormContext";
 
 
 export default function ({ project }: { project: Project }) {
-  const { getPerson } = useDataContext();
+  const { getPerson, postData } = useDataContext();
   const { fields, handleInputChange, addFields } = useFormContext();
   const [milestonesToUpdate, updateMilestonesToUpdate] = useState<Milestone[]>(project.Milestones || [])
 
@@ -57,14 +57,14 @@ export default function ({ project }: { project: Project }) {
 
   function onSubmit(e: any) {
     e.preventDefault();
-    console.log(fields)
+    postData('update', fields)
   }
 
   return <>
     {project.Team && <div>
       <label className="usa-label" htmlFor={fields.updater.id}>{fields.updater.label}</label>
       <select className="usa-select" name={fields.updater.name} id={fields.updater.id} required={fields.updater.required}>
-        <option>- Choose a team member -</option>
+        <option value={undefined}>- Choose a team member -</option>
         {project.Team.map(id => (
           <option value={id}>{getPerson(id)?.Name}</option>
         ))}
