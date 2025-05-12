@@ -1,40 +1,54 @@
 import { Link } from "react-router";
 import { MilestoneUpdateStatus, Project } from "../utils/DataContext";
 import { scaleTime } from "d3-scale";
+import { useLayoutEffect, useMemo, useRef, useState } from "react";
+
+type StatusColor = {
+  [key in MilestoneUpdateStatus]: {
+    class: string,
+    value: string
+  }
+}
+
+const statusColors: StatusColor = {
+  "Done": {
+    class: 'usa-alert--success',
+    value: ' #00a91c'
+  },
+  "In progress": {
+    class: "usa-alert--info",
+    value: '#00bde3'
+  },
+  "At risk": {
+    class: "usa-alert--warning",
+    value: '#ffbe2e'
+  },
+  "Blocked": {
+    class: "usa-alert--error",
+    value: '#d54309'
+  }
+}
 
 export default function ({ project }: { project: Project }) {
   const currentDate = new Date();
   const oneMonthAgo = new Date(currentDate);
   oneMonthAgo.setMonth(currentDate.getMonth() - 1)
 
-  const svgWidth = 650
-  const getX = scaleTime([oneMonthAgo, currentDate], [200, svgWidth]);
-
-  type StatusColor = {
-    [key in MilestoneUpdateStatus]: {
-      class: string,
-      value: string
+  const svgContainer = useRef<SVGSVGElement>(null);
+  const [boundingClientRect, setBoundingClientRect] = useState<DOMRect>(new DOMRect());
+  const getX = useMemo(() => {
+    return scaleTime([oneMonthAgo, currentDate], [200, boundingClientRect.width]);
+  }, [boundingClientRect])
+  
+  useLayoutEffect(() => {
+    function handleResize() {
+      if (!svgContainer.current) { return; }
+      setBoundingClientRect(svgContainer.current.getBoundingClientRect())
     }
-  }
-  const statusColors: StatusColor = {
-    "Done": {
-      class: 'usa-alert--success',
-      value: ' #00a91c'
-    },
-    "In progress": {
-      class: "usa-alert--info",
-      value: '#00bde3'
-    },
-    "At risk": {
-      class: "usa-alert--warning",
-      value: '#ffbe2e'
-    },
-    "Blocked": {
-      class: "usa-alert--error",
-      value: '#d54309'
-    }
-  }
-
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, [])
 
   return (<div className="grid-row margin-y-6 grid-gap">
     <div className="grid-col-2">
@@ -43,7 +57,7 @@ export default function ({ project }: { project: Project }) {
     </div>
 
     <div className="grid-col-9 display-flex flex-justify flex-align-stretch flex-column">
-      <svg height={`${(project.Milestones?.length || 0) * 30}px`} width={svgWidth} viewBox={`0 0 ${svgWidth} ${20 + 30 * (project.Milestones?.length || 0)}`}>
+      <svg height={`${(project.Milestones?.length || 0) * 30}px`} width="100%" viewBox={`0 0 ${boundingClientRect.width} ${20 + 30 * (project.Milestones?.length || 0)}`} ref={svgContainer}>
         {project.Milestones?.map((m, idx) => {
           const y = 10 + (idx + 1) * 30
           const updates = m["Milestone updates"]
