@@ -1,4 +1,4 @@
-import { Milestone, MilestoneUpdate } from "../utils/DataContext";
+import { Milestone, MilestoneUpdate } from "../contexts/DataContext";
 
 export default function Tooltip({ update, milestone }: { update: MilestoneUpdate, milestone: Milestone }) {
   return <div id="tooltip" style={{

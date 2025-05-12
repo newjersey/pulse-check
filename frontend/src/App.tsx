@@ -2,7 +2,7 @@ import { Routes, Route, Link, useLocation } from 'react-router';
 import Projects from './pages/Projects';
 import './App.css'
 import SubmitUpdate from './pages/SubmitUpdate';
-import { DataContextProvider } from './utils/DataContext';
+import { DataContextProvider } from './contexts/DataContext';
 import Login from './pages/Login';
 import Project from './pages/Project';
 

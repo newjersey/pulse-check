@@ -1,5 +1,5 @@
 import { useEffect, ReactNode } from "react";
-import { useDataContext } from "../utils/DataContext";
+import { useDataContext } from "../contexts/DataContext";
 import AuthWrapper from "./AuthWrapper";
 
 export default function ({ title, children, useAuthWrapper = true }: { title: string, children: ReactNode, useAuthWrapper?: boolean }) {

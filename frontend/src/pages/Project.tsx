@@ -1,6 +1,6 @@
 import { useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
-import { useDataContext } from "../utils/DataContext";
+import { useDataContext } from "../contexts/DataContext";
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
 import { useEffect, useState } from "react";
 

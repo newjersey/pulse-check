@@ -1,6 +1,6 @@
 import { useState } from "react";
 import PageTemplate from "../components/PageTemplate";
-import { useDataContext } from "../utils/DataContext";
+import { useDataContext } from "../contexts/DataContext";
 import { useLocation, useNavigate } from "react-router";
 
 export default function () {

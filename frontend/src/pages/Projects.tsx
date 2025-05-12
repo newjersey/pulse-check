@@ -1,5 +1,5 @@
 import PageTemplate from '../components/PageTemplate';
-import { Project, useDataContext } from '../utils/DataContext';
+import { Project, useDataContext } from '../contexts/DataContext';
 import { useEffect, useState } from 'react';
 import ProjectRow from '../components/ProjectRow';
 import { useLocation } from 'react-router';
