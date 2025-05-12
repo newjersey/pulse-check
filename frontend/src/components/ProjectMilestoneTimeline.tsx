@@ -1,7 +1,8 @@
 import { Link } from "react-router";
-import { MilestoneUpdateStatus, Project } from "../utils/DataContext";
+import { Milestone, MilestoneUpdate, MilestoneUpdateStatus, Project } from "../utils/DataContext";
 import { scaleTime } from "d3-scale";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
+import Tooltip from "./Tooltip";
 
 type StatusColor = {
   [key in MilestoneUpdateStatus]: {
@@ -34,12 +35,17 @@ export default function ({ project }: { project: Project }) {
   const oneMonthAgo = new Date(currentDate);
   oneMonthAgo.setMonth(currentDate.getMonth() - 1)
 
+  function svgHeight(project: Project) {
+    return 20 + (project.Milestones?.length || 0) * 30
+  }
   const svgContainer = useRef<SVGSVGElement>(null);
   const [boundingClientRect, setBoundingClientRect] = useState<DOMRect>(new DOMRect());
   const getX = useMemo(() => {
     return scaleTime([oneMonthAgo, currentDate], [200, boundingClientRect.width]);
   }, [boundingClientRect])
-  
+
+  const [highlightedUpdate, setHighlightedUpdate] = useState<{ update: MilestoneUpdate | undefined, milestone: Milestone, x1: number, x2: number, y: number }>();
+
   useLayoutEffect(() => {
     function handleResize() {
       if (!svgContainer.current) { return; }
@@ -51,15 +57,15 @@ export default function ({ project }: { project: Project }) {
   }, [])
 
   return (<div className="grid-row margin-y-6 grid-gap">
-    <div className="grid-col-2">
+    <div className="grid-col-3">
       <h2 className="margin-0">{project["Name"]}</h2>
       <p className="margin-0">{project["Phase"]}</p>
     </div>
 
-    <div className="grid-col-9 display-flex flex-justify flex-align-stretch flex-column">
-      <svg height={`${(project.Milestones?.length || 0) * 30}px`} width="100%" viewBox={`0 0 ${boundingClientRect.width} ${20 + 30 * (project.Milestones?.length || 0)}`} ref={svgContainer}>
+    <div className="grid-col-8 display-flex flex-justify flex-align-stretch flex-column">
+      <svg height={`${svgHeight(project)}px`} width="100%" viewBox={`0 0 ${boundingClientRect.width} ${svgHeight(project)}`} ref={svgContainer} overflow={'visible'} style={{ zIndex: 99 }}>
         {project.Milestones?.map((m, idx) => {
-          const y = 10 + (idx + 1) * 30
+          const y = (1 + idx) * 30
           const updates = m["Milestone updates"]
           updates?.sort((a, b) => new Date(a.Created).getUTCDate() - new Date(b.Created).getUTCDate())
           return (<g>
@@ -72,10 +78,23 @@ export default function ({ project }: { project: Project }) {
               if (nextUpdate) {
                 nextX = getX(new Date(nextUpdate.Created))
               }
-              return <rect fill={statuscolor.value} y={y - 10} width={nextX - x - 2} height={12} x={x}></rect>
+              return (<rect
+                fill={statuscolor.value}
+                y={y - 15}
+                width={nextX - x - 2}
+                height={25}
+                x={x}
+                tabIndex={0}
+                onFocus={() => setHighlightedUpdate({ update: u, milestone: m, x1: x, x2: nextX, y })}
+                onBlur={() => setHighlightedUpdate(undefined)}
+                onMouseEnter={() => setHighlightedUpdate({ update: u, milestone: m, x1: x, x2: nextX, y })}
+                onMouseLeave={() => setHighlightedUpdate(undefined)}></rect>)
             })}
           </g>)
         })}
+        {highlightedUpdate?.update && <foreignObject x={(highlightedUpdate?.x1 + highlightedUpdate?.x2) / 2} y={highlightedUpdate.y} height="10rem" width="20rem">
+          <Tooltip update={highlightedUpdate?.update} milestone={highlightedUpdate?.milestone} />
+        </foreignObject>}
       </svg>
     </div>
 
