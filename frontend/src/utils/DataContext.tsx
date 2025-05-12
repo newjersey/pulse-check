@@ -42,6 +42,12 @@ export type Project = {
   Description: string;
   Phase: ProjectPhaseValues[number];
   Milestones?: Milestone[];
+  Team: string[];
+}
+
+export type Person = {
+  Name: string;
+  id: string;
 }
 
 export type DataContextType = {
@@ -50,6 +56,8 @@ export type DataContextType = {
   loading: Boolean;
   projects: Project[];
   getProject: (id: string | undefined) => Project | undefined;
+  getPerson: (id: string | undefined) => Person | undefined;
+  people: Person[];
 }
 
 const DataContext = createContext<DataContextType>({
@@ -58,6 +66,8 @@ const DataContext = createContext<DataContextType>({
   loading: false,
   projects: [],
   getProject: () => undefined,
+  people: [],
+  getPerson: () => undefined,
 });
 
 const { Provider } = DataContext;
@@ -69,7 +79,8 @@ const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
-  const [projects, setProjects] = useState<Project[]>([]) // consider setting by ID instead?
+  const [projects, setProjects] = useState<Project[]>([])
+  const [people, setPeople] = useState<Person[]>([])
   
   useEffect(() => {
     const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
@@ -92,14 +103,19 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     };
     if (authToken) {
       fetchData('projects', setProjects);
+      fetchData('people', setPeople);
     }
-  }, [authToken, setLoading, setProjects])
+  }, [authToken])
 
   function getProject(id: string | undefined): Project | undefined {
     return projects?.find(p => p.id === id)
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject }}>
+  function getPerson(id: string | undefined): Person | undefined {
+    return people?.find(p => p.id === id)
+  }
+
+  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject, people, getPerson }}>
     {children}
   </Provider>
 }

@@ -79,6 +79,18 @@ app.get('/api/projects', async c => {
   return c.json({ data: projectsWithMilestones, status: 200 });
 })
 
+app.get('/api/people', async c => {
+  const data = await getAllRecords(base, 'PEOPLE', { sort: [{ field: "Name", direction: "asc" }] });
+  return c.json({ data, status: 200 })
+})
+
+app.post('/api/update', async c => {
+  // get updater, new milestone updates, and new milestones
+  // create new milestones first - keep track of id from frontend + actual created id
+  // add updater to milestone updates
+  // then create updates, associating them with milestones (incl new ones)
+})
+
 serve({ fetch: app.fetch, port: 3001 })
 
 export const handler = handle(app)

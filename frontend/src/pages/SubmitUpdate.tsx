@@ -4,7 +4,7 @@ import { Milestone, statusValues, useDataContext } from "../utils/DataContext";
 import { useEffect, useState } from "react";
 
 export default function () {
-  const { getProject, loading } = useDataContext();
+  const { getProject, loading, getPerson } = useDataContext();
   const { projectId } = useParams();
   const project = getProject(projectId)
   const [milestonesToUpdate, updateMilestonesToUpdate] = useState<Milestone[]>([])
@@ -50,8 +50,8 @@ export default function () {
         <label className="usa-label" htmlFor={`updater`}>Updater</label>
         <select className="usa-select" name={`updater`} id={`updater`}>
           <option>- Choose a team member -</option>
-          {statusValues.map(status => (
-            <option value={status}>{status}</option>
+          {project.Team.map(id => (
+            <option value={id}>{getPerson(id)?.Name}</option>
           ))}
         </select>
       </div>

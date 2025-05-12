@@ -3,7 +3,8 @@ import { AirtableBase } from "airtable/lib/airtable_base";
 export const tableNames = {
   PROJECTS: 'Projects',
   MILESTONES: 'Milestones',
-  MILESTONE_UPDATES: 'Milestone updates'
+  MILESTONE_UPDATES: 'Milestone updates',
+  PEOPLE: 'People'
 }
 
 type TableNameKey = keyof typeof tableNames;
