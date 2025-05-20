@@ -1,9 +1,10 @@
 import PageTemplate from '../components/PageTemplate';
-import { Project, useDataContext } from '../contexts/DataContext';
+import { useDataContext } from '../contexts/DataContext';
 import { useEffect, useState } from 'react';
 import ProjectRow from '../components/ProjectRow';
 import { useLocation } from 'react-router';
 import ProjectMilestoneTimeline from '../components/ProjectMilestoneTimeline';
+import { Project } from '../utils/types';
 
 export default function () {
   const { projects } = useDataContext();
@@ -13,7 +14,7 @@ export default function () {
   const { search } = useLocation();
 
   useEffect(() => {
-    const active = projects.filter(p => p.Phase !== 'Sunset')
+    const active = Object.values(projects).filter(p => p.Phase !== 'Sunset')
     // const inactive = projects.filter(p => p.Phase === 'Sunset')
     setActiveProjects(active)
     // setSunsetProjects(inactive)

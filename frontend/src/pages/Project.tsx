@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 
 export default function () {
   const { projectId } = useParams();
-  const { getProject, loading } = useDataContext();
-  const project = getProject(projectId)
+  const { projects, loading } = useDataContext();
+  const project = projectId ? projects[projectId] : undefined
   const [milestonesToggled, setMilestonesToggled] = useState<{ [key: string]: { expanded: boolean } }>()
 
   useEffect(() => {

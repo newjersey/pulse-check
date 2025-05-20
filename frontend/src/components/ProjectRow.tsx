@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { Milestone, MilestoneUpdate, MilestoneUpdateStatus, Project } from "../contexts/DataContext";
+import { Project, Milestone, MilestoneUpdate, MilestoneUpdateStatus } from "../utils/types";
 
 export default function ({ project }: { project: Project }) {
   function getMostRecentMilestoneUpdates(project: Project): (Milestone & { mostRecentUpdate?: MilestoneUpdate })[] | undefined {

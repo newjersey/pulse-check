@@ -1,15 +1,23 @@
 import { AirtableBase } from "airtable/lib/airtable_base";
 
+export type AirtableRecord = { [x: string]: any }
+
 export const tableNames = {
-  PROJECTS: 'Projects',
-  MILESTONES: 'Milestones',
-  MILESTONE_UPDATES: 'Milestone updates',
-  PEOPLE: 'People'
+  projects: 'Projects',
+  people: 'People',
+  updates: 'Project updates',
+  deliverables: 'Deliverables',
+  technologies: 'Technologies',
+  organizations: 'Organizations',
+  metrics_updates: 'Metrics updates',
+  metric_types: 'Metric types',
+  needs_types: 'Project needs types',
+  needs: 'Current project needs'
 }
 
-type TableNameKey = keyof typeof tableNames;
+export type TableNameKey = keyof typeof tableNames;
 
-export async function getAllRecords(base: AirtableBase, tableName: TableNameKey, options?: object) {
+export async function getAllRecords(base: AirtableBase, tableName: TableNameKey, options?: object): Promise<AirtableRecord[]> {
   try {
     const response = await base(tableNames[tableName]).select({
       view: "Grid view",
@@ -25,7 +33,20 @@ export async function getAllRecords(base: AirtableBase, tableName: TableNameKey,
     return records
   } catch (e) {
     console.log(e)
+    return []
   }
+}
+type RecordsArgs = [base: AirtableBase, tableName: TableNameKey, options?: object]
+type RecordsByID = {
+  [x: string]: AirtableRecord
+}
+export async function getAllRecordsById(...args: RecordsArgs) {
+  const records = await getAllRecords(...args)
+  const byId: RecordsByID = {}
+  for (const record of records) {
+    byId[record.id] = record;
+  }
+  return byId
 }
 
 export async function fetchLinkedRecords(base: AirtableBase, originalRecord: { [key: string]: any }, tableName: TableNameKey, options?: object) {

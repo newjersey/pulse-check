@@ -1,74 +1,21 @@
 import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
-
-export const statusValues = [
-  "Backlog/planning",
-  "In progress",
-  "At risk",
-  "Blocked",
-  "Done",
-  "Canceled"
-]
-type StatusValues = typeof statusValues;
-export type MilestoneUpdateStatus = StatusValues[number]
-
-export type MilestoneUpdate = {
-  id: string;
-  ID: string;
-  Created: string;
-  Description: string;
-  Status: MilestoneUpdateStatus;
-}
-
-export type Milestone = {
-  id: string;
-  Title: string;
-  Description: string;
-  'Milestone updates'?: MilestoneUpdate[]
-}
-
-export const projectPhaseValues = [
-  "Discovery",
-  "Prototype ",
-  "Launch",
-  "Maintain",
-  "Handoff",
-  "Intake",
-  "Sunset"
-]
-type ProjectPhaseValues = typeof projectPhaseValues;
-export type Project = {
-  id: string;
-  Name: string;
-  Description: string;
-  Phase: ProjectPhaseValues[number];
-  Milestones?: Milestone[];
-  Team: string[];
-}
-
-export type Person = {
-  Name: string;
-  id: string;
-}
-
-export type DataContextType = {
-  authToken: string | undefined;
-  setAuthToken: Function;
-  loading: Boolean;
-  projects: Project[];
-  getProject: (id: string | undefined) => Project | undefined;
-  getPerson: (id: string | undefined) => Person | undefined;
-  people: Person[];
-  postData: (endpoint: string, data: any) => any;
-}
+import { Update } from 'vite';
+import { DataContextType, RecordByIdType, Project, Person, Deliverable, Technology, Organization, MetricUpdate, MetricType, NeedType, Need } from '../utils/types';
 
 const DataContext = createContext<DataContextType>({
   authToken: undefined,
   setAuthToken: () => {},
   loading: false,
-  projects: [],
-  getProject: () => undefined,
-  people: [],
-  getPerson: () => undefined,
+  projects: {},
+  people: {},
+  updates: {},
+  deliverables: {},
+  technologies: {},
+  organizations: {},
+  metricsUpdates: {},
+  metricTypes: {},
+  needsTypes: {},
+  needs: {},
   postData: () => {}
 });
 
@@ -81,9 +28,19 @@ const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [authToken, setAuthToken] = useState();
-  const [projects, setProjects] = useState<Project[]>([])
-  const [people, setPeople] = useState<Person[]>([])
   const [refreshData, setRefreshData] = useState(false)
+
+  const [projects, setProjects] = useState<RecordByIdType<Project>>({})
+  const [people, setPeople] = useState<RecordByIdType<Person>>({})
+  const [updates, setUpdates] = useState<RecordByIdType<Update>>({})
+  const [deliverables, setDeliverables] = useState<RecordByIdType<Deliverable>>({})
+  const [technologies, setTechnologies] = useState<RecordByIdType<Technology>>({})
+  const [organizations, setOrganizations] = useState<RecordByIdType<Organization>>({})
+  const [metricsUpdates, setMetricsUpdates] = useState<RecordByIdType<MetricUpdate>>({})
+  const [metricTypes, setMetricTypes] = useState<RecordByIdType<MetricType>>({})
+  const [needsTypes, setNeedsTypes] = useState<RecordByIdType<NeedType>>({})
+  const [needs, setNeeds] = useState<RecordByIdType<Need>>({})
+
   
   useEffect(() => {
     const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
@@ -108,6 +65,14 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     if (authToken) {
       fetchData('projects', setProjects);
       fetchData('people', setPeople);
+      fetchData('updates', setUpdates);
+      fetchData('deliverables', setDeliverables);
+      fetchData('technologies', setTechnologies);
+      fetchData('organizations', setOrganizations);
+      fetchData('metrics_updates', setMetricsUpdates);
+      fetchData('metric_types', setMetricTypes);
+      fetchData('needs_types', setNeedsTypes);
+      fetchData('needs', setNeeds);
     }
   }, [authToken, refreshData])
 
@@ -133,15 +98,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  function getProject(id: string | undefined): Project | undefined {
-    return projects?.find(p => p.id === id)
-  }
-
-  function getPerson(id: string | undefined): Person | undefined {
-    return people?.find(p => p.id === id)
-  }
-
-  return <Provider value={{ authToken, setAuthToken, loading, projects, getProject, people, getPerson, postData }}>
+  return <Provider value={{ authToken, setAuthToken, loading, projects: projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
     {children}
   </Provider>
 }

@@ -1,10 +1,11 @@
-import { Milestone, Project, statusValues, useDataContext } from "../contexts/DataContext";
+import { useDataContext } from "../contexts/DataContext";
 import { useState } from "react";
 import { useFormContext } from "../contexts/FormContext";
+import { Project, Milestone, statusValues } from "../utils/types";
 
 
 export default function ({ project }: { project: Project }) {
-  const { getPerson, postData } = useDataContext();
+  const { people, postData } = useDataContext();
   const { fields, handleInputChange, addFields } = useFormContext();
   const [milestonesToUpdate, updateMilestonesToUpdate] = useState<Milestone[]>(project.Milestones || [])
 
@@ -66,7 +67,7 @@ export default function ({ project }: { project: Project }) {
       <select className="usa-select" name={fields.updater.name} id={fields.updater.id} required={fields.updater.required}>
         <option value={undefined}>- Choose a team member -</option>
         {project.Team.map(id => (
-          <option value={id}>{getPerson(id)?.Name}</option>
+          <option value={id}>{people[id]?.Name}</option>
         ))}
       </select>
     </div>}

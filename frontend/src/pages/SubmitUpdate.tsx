@@ -5,9 +5,9 @@ import { Fields, FormContextProvider } from "../contexts/FormContext";
 import SubmitUpdateFields from "./SubmitUpdateFields";
 
 export default function () {
-  const { getProject, loading } = useDataContext();
+  const { projects, loading } = useDataContext();
   const { projectId } = useParams();
-  const project = getProject(projectId)
+  const project = projectId ? projects[projectId] : undefined
 
   if (loading || !project) {
     return <PageTemplate title="Loading project...">

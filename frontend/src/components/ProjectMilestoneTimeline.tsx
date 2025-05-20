@@ -1,8 +1,8 @@
 import { Link } from "react-router";
-import { Milestone, MilestoneUpdate, MilestoneUpdateStatus, Project } from "../contexts/DataContext";
 import { scaleTime } from "d3-scale";
 import { useLayoutEffect, useMemo, useRef, useState } from "react";
 import Tooltip from "./Tooltip";
+import { MilestoneUpdateStatus, Project, MilestoneUpdate, Milestone } from "../utils/types";
 
 type StatusColor = {
   [key in MilestoneUpdateStatus]: {
