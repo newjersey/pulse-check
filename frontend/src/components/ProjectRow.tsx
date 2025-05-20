@@ -13,7 +13,7 @@ export default function ({ project }: { project: Project }) {
   const currentNeeds = useMemo(() => {
     if (!needs || !needsTypes) { return [] }
     return hydrateIdList(project["Current project needs"], needs)
-      .map(n => ({...n, "Project need type": needsTypes[n["Project need type"][0]]}))
+      .map(n => ({ ...n, "Project need type": needsTypes[n["Project need type"][0]] }))
   }, [needs, needsTypes])
 
   return (<div className="grid-row margin-y-6 grid-gap">
@@ -33,12 +33,12 @@ export default function ({ project }: { project: Project }) {
 
     <div className="grid-col-2">
       {mostRecentUpdate?.Status &&
-      <div
-        className={`usa-alert flex-1 margin-x-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
-        key={`${project.id}-${mostRecentUpdate.Status}`}
-      >
-        <div>{mostRecentUpdate.Status}</div>
-      </div>}
+        <div
+          className={`usa-alert flex-1 margin-x-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
+          key={`${project.id}-${mostRecentUpdate.Status}`}
+        >
+          <div>{mostRecentUpdate.Status}</div>
+        </div>}
     </div>
 
     <div className="grid-col-2">
@@ -47,11 +47,19 @@ export default function ({ project }: { project: Project }) {
           <dt className="text-bold">{n["Project need type"].Need}</dt>
           <dd className="margin-0">{n.Description}</dd>
         </>)}
-        </dl>}
+      </dl>}
     </div>
 
     <div className="grid-col-3">
-      {mostRecentUpdate?.Description}
+      {mostRecentUpdate && <>
+        <p>
+          {mostRecentUpdate?.Description}
+        </p>
+        <p className="text-italic font-body-xs">
+          Updated {mostRecentUpdate?.Created}
+        </p>
+      </>
+      }
     </div>
   </div>)
 }
