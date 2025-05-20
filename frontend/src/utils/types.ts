@@ -48,7 +48,7 @@ export const statusValues = [
   "Planning",
   "On track"
 ]
-type StatusValues = typeof statusValues;
+export type StatusValues = typeof statusValues;
 export type ProjectUpdate = {
   id: string;
   Status: StatusValues[number];
@@ -79,10 +79,10 @@ export type MetricUpdate = {
 }
 
 export const metricValueTypes = [
-  "Blocked externally",
-  "Blocked internally",
-  "Planning",
-  "On track"
+  "Integer",
+  "Money",
+  "Percentage",
+  "Decimal"
 ]
 type MetricValueTypes = typeof metricValueTypes;
 export type MetricType = {

@@ -1,4 +1,4 @@
-import { Project, RecordByIdType, ProjectUpdate } from "./types"
+import { Project, RecordByIdType, ProjectUpdate, StatusValues } from "./types"
 
 export function hydrateIdList<T>(idList: string[] | undefined, records: RecordByIdType<T> | undefined): T[] {
   if (!records || !idList) {
@@ -16,21 +16,17 @@ export function getSortedProjectUpdates(project: Project, allUpdates: RecordById
   })
 }
 
-// const usedStatusValues = {
-//   "Done": {
-//     class: 'usa-alert--success',
-//     value: 0
-//   },
-//   "In progress": {
-//     class: "usa-alert--info",
-//     value: 0
-//   },
-//   "At risk": {
-//     class: "usa-alert--warning",
-//     value: 0
-//   },
-//   "Blocked": {
-//     class: "usa-alert--error",
-//     value: 0
-//   }
-// }
+export const updateStatusValues: { [key: StatusValues[number]] : { class: string }} = {
+  "On track": {
+    class: 'usa-alert--success',
+  },
+  "Planning": {
+    class: "usa-alert--info",
+  },
+  "Blocked internally": {
+    class: "usa-alert--warning",
+  },
+  "Blocked externally": {
+    class: "usa-alert--error",
+  }
+}
