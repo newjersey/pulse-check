@@ -1,24 +1,18 @@
 import PageTemplate from '../components/PageTemplate';
 import { useDataContext } from '../contexts/DataContext';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import ProjectRow from '../components/ProjectRow';
 import { useLocation } from 'react-router';
 import ProjectMilestoneTimeline from '../components/ProjectMilestoneTimeline';
-import { Project } from '../utils/types';
 
 export default function () {
   const { projects } = useDataContext();
-  const [activeProjects, setActiveProjects] = useState<Project[]>([])
   // const [sunsetProjects, setSunsetProjects] = useState<Project[]>([])
 
   const { search } = useLocation();
 
-  useEffect(() => {
-    const active = Object.values(projects).filter(p => p.Phase !== 'Sunset')
-    // const inactive = projects.filter(p => p.Phase === 'Sunset')
-    setActiveProjects(active)
-    // setSunsetProjects(inactive)
-  }, [projects])
+
+  const activeProjects = useMemo(() => projects ? Object.values(projects).filter(p => p.Phase !== 'Sunset') : [], [projects])
 
   return <PageTemplate title="Projects">
     {activeProjects && activeProjects.map(project =>

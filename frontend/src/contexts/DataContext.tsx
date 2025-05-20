@@ -1,21 +1,20 @@
 import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
-import { Update } from 'vite';
-import { DataContextType, RecordByIdType, Project, Person, Deliverable, Technology, Organization, MetricUpdate, MetricType, NeedType, Need } from '../utils/types';
+import { DataContextType, RecordByIdType, Project, Person, Deliverable, Technology, Organization, MetricUpdate, MetricType, NeedType, Need, ProjectUpdate } from '../utils/types';
 
 const DataContext = createContext<DataContextType>({
   authToken: undefined,
   setAuthToken: () => {},
   loading: false,
-  projects: {},
-  people: {},
-  updates: {},
-  deliverables: {},
-  technologies: {},
-  organizations: {},
-  metricsUpdates: {},
-  metricTypes: {},
-  needsTypes: {},
-  needs: {},
+  projects: undefined,
+  people: undefined,
+  updates: undefined,
+  deliverables: undefined,
+  technologies: undefined,
+  organizations: undefined,
+  metricsUpdates: undefined,
+  metricTypes: undefined,
+  needsTypes: undefined,
+  needs: undefined,
   postData: () => {}
 });
 
@@ -30,18 +29,17 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [authToken, setAuthToken] = useState();
   const [refreshData, setRefreshData] = useState(false)
 
-  const [projects, setProjects] = useState<RecordByIdType<Project>>({})
-  const [people, setPeople] = useState<RecordByIdType<Person>>({})
-  const [updates, setUpdates] = useState<RecordByIdType<Update>>({})
-  const [deliverables, setDeliverables] = useState<RecordByIdType<Deliverable>>({})
-  const [technologies, setTechnologies] = useState<RecordByIdType<Technology>>({})
-  const [organizations, setOrganizations] = useState<RecordByIdType<Organization>>({})
-  const [metricsUpdates, setMetricsUpdates] = useState<RecordByIdType<MetricUpdate>>({})
-  const [metricTypes, setMetricTypes] = useState<RecordByIdType<MetricType>>({})
-  const [needsTypes, setNeedsTypes] = useState<RecordByIdType<NeedType>>({})
-  const [needs, setNeeds] = useState<RecordByIdType<Need>>({})
+  const [projects, setProjects] = useState<RecordByIdType<Project>>()
+  const [people, setPeople] = useState<RecordByIdType<Person>>()
+  const [updates, setUpdates] = useState<RecordByIdType<ProjectUpdate>>()
+  const [deliverables, setDeliverables] = useState<RecordByIdType<Deliverable>>()
+  const [technologies, setTechnologies] = useState<RecordByIdType<Technology>>()
+  const [organizations, setOrganizations] = useState<RecordByIdType<Organization>>()
+  const [metricsUpdates, setMetricsUpdates] = useState<RecordByIdType<MetricUpdate>>()
+  const [metricTypes, setMetricTypes] = useState<RecordByIdType<MetricType>>()
+  const [needsTypes, setNeedsTypes] = useState<RecordByIdType<NeedType>>()
+  const [needs, setNeeds] = useState<RecordByIdType<Need>>()
 
-  
   useEffect(() => {
     const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
       setLoading(true);
@@ -98,7 +96,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects: projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
+  return <Provider value={{ authToken, setAuthToken, loading, projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
     {children}
   </Provider>
 }
