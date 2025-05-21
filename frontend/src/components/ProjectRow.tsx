@@ -3,13 +3,13 @@ import { Project } from "../utils/types";
 import { useDataContext } from "../contexts/DataContext";
 import { getSortedProjectUpdates, hydrateIdList, updateStatusValues } from "../utils/projectUtils";
 import { useMemo } from "react";
+import TeamList from "./TeamList";
 
 export default function ({ project }: { project: Project }) {
-  const { people, updates, needs, needsTypes } = useDataContext();
+  const { updates, needs, needsTypes } = useDataContext();
 
   const sortedUpdates = useMemo(() => updates ? getSortedProjectUpdates(project, updates) : [], [updates])
   const mostRecentUpdate = useMemo(() => sortedUpdates ? sortedUpdates[0] : undefined, [sortedUpdates])
-  const team = useMemo(() => hydrateIdList(project.Team, people), [people])
   const currentNeeds = useMemo(() => {
     if (!needs || !needsTypes) { return [] }
     return hydrateIdList(project["Current project needs"], needs)
@@ -20,11 +20,7 @@ export default function ({ project }: { project: Project }) {
     <div className="grid-col-3">
       <Link className="margin-0" to={`/projects/${project["id"]}`}>{project["Name"]}</Link>
       <p className="margin-0">{project["Phase"]}</p>
-      <ul>
-        {team.map(person => {
-          return <li>{person.Name}</li>
-        })}
-      </ul>
+      <TeamList project={project}/>
     </div>
 
     <div className="grid-col-2">
@@ -34,7 +30,7 @@ export default function ({ project }: { project: Project }) {
     <div className="grid-col-2">
       {mostRecentUpdate?.Status &&
         <div
-          className={`usa-alert flex-1 margin-x-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
+          className={`usa-alert flex-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
           key={`${project.id}-${mostRecentUpdate.Status}`}
         >
           <div>{mostRecentUpdate.Status}</div>

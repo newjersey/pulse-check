@@ -1,19 +1,19 @@
 import { useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
 import { useDataContext } from "../contexts/DataContext";
-import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
+import { getSortedProjectUpdates, hydrateIdList, updateStatusValues } from "../utils/projectUtils";
+import TeamList from "../components/TeamList";
 
 export default function () {
   const { projectId } = useParams();
-  const { projects, loading } = useDataContext();
-  const project = projectId ? projects[projectId] : undefined
-  const [milestonesToggled, setMilestonesToggled] = useState<{ [key: string]: { expanded: boolean } }>()
+  const { projects, deliverables, updates, loading } = useDataContext();
 
-  useEffect(() => {
-    const milestonesById = project?.Milestones?.reduce((o, { id, ...milestone }) => ({ ...o, [id]: { ...milestone, expanded: false } }), {})
-    setMilestonesToggled(milestonesById)
-  }, [project])
+  const project = useMemo(() => projectId && projects ? projects[projectId] : undefined, [projectId, projects])
+  const projectDeliverables = useMemo(() => hydrateIdList(project?.Deliverables, deliverables), [project, deliverables])
+
+  const sortedUpdates = useMemo(() => updates && project ? getSortedProjectUpdates(project, updates) : [], [project, updates])
+  const mostRecentUpdate = useMemo(() => sortedUpdates ? sortedUpdates[0] : undefined, [sortedUpdates])
 
   if (loading || !project) {
     return <PageTemplate title="Loading project...">
@@ -21,83 +21,69 @@ export default function () {
     </PageTemplate>
   }
 
-  function toggleMilestone(id: string) {
-    const milestone = milestonesToggled?.[id]
-    if (!milestone) {
-      return
-    }
-    setMilestonesToggled({ ...milestonesToggled, [id]: { ...milestone, expanded: !milestone.expanded } })
-  }
-
   return <PageTemplate title={project.Name}>
-    <p>{project.Description}</p>
-    {project.Milestones ? (
-      <table className="usa-table usa-table--borderless">
-        <thead>
-          <tr>
-            <th scope="col">Milestone</th>
-            <th scope="col">Date last updated</th>
-            <th scope="col">Update</th>
-            <th scope="col">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/* TODO https://dequeuniversity.com/class/semantic-structure-wcag-2.2/tables/complex */}
-          {project.Milestones.map((m) => (
-            m["Milestone updates"] || [{ Status: '', id: m.id, Created: '', Description: 'No updates yet' }]).map((u, idx, updates) => {
-              const expanded = milestonesToggled?.[m.id]?.expanded
-              let tdStyleOverride = {}
-              if (idx > 0 && !expanded) {
-                return
-              }
-              if (expanded && updates.length > 1) {
-                tdStyleOverride = {
-                  borderTop: 'none',
-                  borderBottom: 'none',
-                }
-              }
-              return (<tr key={u.id}>
-                {idx === 0 && <th scope="row" rowSpan={expanded ? updates.length : 1} style={{ verticalAlign: 'top' }}>
-                  <div className="display-flex flex-1">
-                    {updates.length > 1 && <button
-                      onClick={() => toggleMilestone(m.id)}
-                      className="bg-transparent cursor-pointer text-black display-flex flex-align-center border-0 flex-column flex-justify-center margin-left-neg-6 margin-right-1"
-                    >
-                      <span className="usa-button usa-sr-only">
-                        {m.Title} Details
-                      </span>
-                      {!expanded ?
-                        (<svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
-                          <use href={`${imageUrl}#unfold_more`}></use>
-                        </svg>) :
-                        (<svg className="usa-icon" aria-hidden="true" focusable="false" role="img">
-                          <use href={`${imageUrl}#unfold_less`}></use>
-                        </svg>)
-                      }
-                    </button>}
+    <div className="grid-row">
+      <div className="grid-col-4">
+        <p>{project.Phase}</p>
+        <TeamList project={project} />
+      </div>
+      <div className="grid-col-8">
+        <p>{project.Description}</p>
+      </div>
+    </div>
 
-                    <div className="display-flex flex-column">
-                      <p className='text-bold margin-0'>
-                        {m.Title}
-                      </p>
-                      <p className="margin-0">
-                        {m.Description}
-                      </p>
+    <div className="grid-row grid-gap">
+      <div className="grid-col-2">
+        <h2>Progress</h2>
+        <div>
+          Progress TBD
+        </div>
+      </div>
+      <div className="grid-col-2">
+        <h2>Status</h2>
+        {mostRecentUpdate?.Status &&
+          <div
+            className={`usa-alert flex-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
+            key={`${project.id}-${mostRecentUpdate.Status}`}
+          >
+            <div>{mostRecentUpdate.Status}</div>
+          </div>}
+      </div>
+      <div className="grid-col-8">
+        <h2>Deliverables</h2>
+        {projectDeliverables ? (
+          <table className="usa-table usa-table--borderless">
+            <thead>
+              <tr>
+                <th scope="col">Deliverable</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {/* TODO https://dequeuniversity.com/class/semantic-structure-wcag-2.2/tables/complex */}
+              {projectDeliverables.map((u) => (
+                <tr key={u.id}>
+                  <th scope="row" rowSpan={1} style={{ verticalAlign: 'top' }}>
+                    {u.Title}
+                  </th>
+                  <td>
+                    {u['Description']}
+                  </td>
+                  <td>
+                    <div
+                      className={`usa-alert flex-1 margin-y-0 padding-2 ${updateStatusValues[u.Status]?.class}`}
+                      key={`${project.id}-${u.Status}`}
+                    >
+                      <div>{u.Status}</div>
                     </div>
-                  </div>
-                </th>}
-                <td style={tdStyleOverride}>
-                  {u['Created']}
-                </td>
-                <td style={tdStyleOverride}>
-                  {u['Description']}
-                </td>
-                <td style={tdStyleOverride}>
-                  {u['Status']}
-                </td>
-              </tr>)
-            }))}
-        </tbody>
-      </table>) : <p>No milestones added yet</p>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>) : <p>No milestones added yet</p>}
+      </div>
+    </div>
+
   </PageTemplate>
 }

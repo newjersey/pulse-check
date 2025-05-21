@@ -20,6 +20,9 @@ export const updateStatusValues: { [key: StatusValues[number]] : { class: string
   "On track": {
     class: 'usa-alert--success',
   },
+  "Done": {
+    class: 'usa-alert--success',
+  },
   "Planning": {
     class: "usa-alert--info",
   },

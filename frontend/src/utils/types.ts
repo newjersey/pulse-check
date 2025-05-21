@@ -66,10 +66,21 @@ export type ProjectUpdate = {
   Created: string;
 }
 
+export const deliverableStatusValues = [
+  "Planning",
+  "In progress",
+  "Blocked internally",
+  "Blocked externally",
+  "Done",
+  "Removed"
+]
+export type DeliverableStatusValues = typeof deliverableStatusValues;
 export type Deliverable = {
   id: string;
   Title: string;
+  Description: string;
   Project: string;
+  Status: DeliverableStatusValues[number];
 }
 
 export type Technology = {

@@ -14,7 +14,7 @@ function App() {
         <div className='usa-nav-container'>
           <div className="usa-navbar">
             <div className="usa-logo">
-              <Link to="/" className="usa-logo__text">Resx dashboard</Link>
+              <Link to="/" className="usa-logo__text">Project tracker dashboard</Link>
             </div>
           </div>
         </div>
