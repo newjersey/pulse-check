@@ -108,7 +108,7 @@ export type RecordByIdType<T> = {
 }
 
 export type DataContextType = {
-  authToken: string | undefined;
+  authToken: string | null;
   setAuthToken: Function;
   loading: Boolean;
   projects: RecordByIdType<Project> | undefined;

@@ -2,7 +2,7 @@ import { createContext, ReactNode, SetStateAction, useContext, useEffect, useSta
 import { DataContextType, RecordByIdType, Project, Person, Deliverable, Technology, Organization, MetricUpdate, MetricType, NeedType, Need, ProjectUpdate } from '../utils/types';
 
 const DataContext = createContext<DataContextType>({
-  authToken: undefined,
+  authToken: null,
   setAuthToken: () => {},
   loading: false,
   projects: undefined,
@@ -26,8 +26,12 @@ const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.
 
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
-  const [authToken, setAuthToken] = useState();
+  const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
   const [refreshData, setRefreshData] = useState(false)
+  function setAuthToken(input: string) {
+    _setAuthToken(input)
+    sessionStorage.setItem("nj-ooi-pulse-check", input);
+  }
 
   const [projects, setProjects] = useState<RecordByIdType<Project>>()
   const [people, setPeople] = useState<RecordByIdType<Person>>()
