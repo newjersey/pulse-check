@@ -56,7 +56,8 @@ export const statusValues = [
   "Blocked externally",
   "Blocked internally",
   "Planning",
-  "On track"
+  "On track",
+  "Paused"
 ]
 export type StatusValues = typeof statusValues;
 export type ProjectUpdate = {

@@ -25,7 +25,7 @@ export default function () {
       <label className="usa-label" htmlFor="password">Password</label>
       <input className="usa-input" id="password" name="password" type="password" onChange={(e) => setPassword(e.target.value)} />
       
-      <input type="submit" value="Submit" className="usa-button" />
+      <input type="submit" value="Submit" className="usa-button margin-y-4" />
 
     </form>
   </PageTemplate>

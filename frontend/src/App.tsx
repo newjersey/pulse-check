@@ -10,7 +10,7 @@ function App() {
   return (
     <DataContextProvider>
       <header className="usa-header usa-header--basic">
-        <a className="usa-skipnav" href="#main-content">Skip to main content</a>
+        {/* <a className="usa-skipnav" href="#main-content">Skip to main content</a> */}
         <div className='usa-nav-container'>
           <div className="usa-navbar">
             <div className="usa-logo">
