@@ -1,4 +1,4 @@
-export const projectPhaseValues = [
+export const projectPhase = [
   "Discovery",
   "Prototype ",
   "Launch",
@@ -7,13 +7,23 @@ export const projectPhaseValues = [
   "Intake",
   "Sunset"
 ]
-type ProjectPhaseValues = typeof projectPhaseValues;
+type ProjectPhase = typeof projectPhase;
+
+export const initiatives = [
+  "ResX",
+  "BizX",
+  "C+E Lab",
+  "D+P",
+  "General"
+]
+export type Initiative = typeof initiatives;
 
 export type Project = {
   id: string;
   Name: string;
   Description: string;
-  Phase: ProjectPhaseValues[number];
+  Phase: ProjectPhase[number];
+  Initiative: Initiative[number];
   "Anticipated phase change": string;
   Team: string[];
   Partners: string[];

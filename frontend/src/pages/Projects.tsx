@@ -1,24 +1,58 @@
+import { useMemo } from 'react';
+import { useLocation } from 'react-router';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react'
 import PageTemplate from '../components/PageTemplate';
 import { useDataContext } from '../contexts/DataContext';
-import { useMemo } from 'react';
 import ProjectRow from '../components/ProjectRow';
-import { useLocation } from 'react-router';
 import ProjectMilestoneTimeline from '../components/ProjectMilestoneTimeline';
+import { Initiative, Project } from '../utils/types';
 
 export default function () {
   const { projects } = useDataContext();
-  // const [sunsetProjects, setSunsetProjects] = useState<Project[]>([])
-
   const { search } = useLocation();
 
+  const activeProjectsByInitiative = useMemo(() => {
+    const _activeProjects = projects ? Object.values(projects) : []
 
-  const activeProjects = useMemo(() => projects ? Object.values(projects).filter(p => p.Phase !== 'Sunset') : [], [projects])
+    const tabValues: { [key: Initiative[number]]: { projects: Project[] } } = {
+      "ResX": {
+        projects: []
+      },
+      "BizX": {
+        projects: []
+      },
+      "C+E Lab": {
+        projects: []
+      },
+      "D+P": {
+        projects: []
+      },
+      General: {
+        projects: []
+      },
+    }
+
+    _activeProjects.forEach(p => {
+      tabValues[p.Initiative].projects.push(p)
+    })
+    return tabValues
+  }, [projects])
 
   return <PageTemplate title="Projects">
-    {activeProjects && activeProjects.map(project =>
-      search === '?view=timeline' ? <ProjectMilestoneTimeline key={project.id} project={project} /> : <ProjectRow key={project.id} project={project} />
-    )}
-    {/* <h2>Sunset and handed-off projects</h2>
-    {sunsetProjects && sunsetProjects.map(project => <ProjectRow project={project} />)} */}
+    <TabGroup defaultValue={Object.keys(activeProjectsByInitiative)[0]}>
+      <TabList>
+        {(Object.keys(activeProjectsByInitiative)).map(k => <Tab value={k} key={`trigger-${k}`}><div>{k}</div></Tab>)}
+      </TabList>
+      <TabPanels>
+        {Object.keys(activeProjectsByInitiative).map(k =>
+        (<TabPanel key={k}>
+          {activeProjectsByInitiative[k].projects.map(p => {
+            return search === '?view=timeline' ? <ProjectMilestoneTimeline key={p.id} project={p} /> : <ProjectRow key={p.id} project={p} />
+          })}
+          {activeProjectsByInitiative[k].projects.length === 0 && <p>{`No projects for ${k} yet`}</p>}
+        </TabPanel>)
+        )}
+      </TabPanels>
+    </TabGroup>
   </PageTemplate>
 }

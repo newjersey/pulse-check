@@ -2,3 +2,31 @@
   margin: 0 auto;
   padding: 2rem;
 }
+
+
+div[role=tablist] {
+  border-bottom: 1px solid lightgray;
+}
+
+div[role=tablist] button {
+  margin: 0 1.5em 0 0;
+  font-size: 1.25em;
+  background-color: inherit;
+  border: none;
+  color: gray;
+  font-weight: bold;
+}
+
+div[role=tablist] button div {
+  padding: 0.5em 0;
+  height: 100%;
+  width: 100%;
+}
+
+div[role=tablist] button[aria-selected=true] {
+  color: #005ea2;
+}
+
+div[role=tablist] button[aria-selected=true] div {
+  border-bottom: 4px solid #005ea2;
+}
