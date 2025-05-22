@@ -1,15 +1,15 @@
 import PageTemplate from "../../components/PageTemplate";
 import { useDataContext } from "../../contexts/DataContext";
 import { FormContextProvider } from "../../contexts/FormContext";
-import { UpdateDescription } from "../../components/FormFields";
 import useProject from "../../utils/useProject";
 import LayoutContainer from "../../components/LayoutContainer";
+import UpdateForm from "./UpdateForm";
 
 export default function () {
   const { loading } = useDataContext();
   const { project } = useProject()
 
-  if (loading || !project) {
+  if (loading) {
     return <LayoutContainer>
       <PageTemplate title="Loading project...">
         <></>
@@ -19,12 +19,9 @@ export default function () {
 
   return (
     <LayoutContainer>
-      <PageTemplate title={`Submit an update for ${project.Name}`}>
+      <PageTemplate title={`Submit an update${project ? ` for ${project.Name}` : ''}`}>
         <FormContextProvider>
-          <form>
-            <>Project details</>
-            <UpdateDescription />
-          </form>
+          <UpdateForm />
         </FormContextProvider>
       </PageTemplate>
     </LayoutContainer>

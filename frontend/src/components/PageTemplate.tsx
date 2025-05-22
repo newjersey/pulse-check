@@ -6,7 +6,7 @@ export default function ({ title, children, useAuthWrapper = true }: { title: st
   const { loading } = useDataContext();
 
   useEffect(() => {
-    document.title = `${title} | Pulse Check Resx Dashboard`;
+    document.title = `${title} | OOI project tracker dashboard`;
   }, [title]);
 
   if (useAuthWrapper) {

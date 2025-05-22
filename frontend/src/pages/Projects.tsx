@@ -40,7 +40,7 @@ export default function () {
   }, [projects])
 
   return <LayoutContainer>
-    <PageTemplate title="Projects">
+    <PageTemplate title="Project overview">
       <TabGroup defaultValue={Object.keys(activeProjectsByInitiative)[0]}>
         <TabList>
           {(Object.keys(activeProjectsByInitiative)).map(k => <Tab value={k} key={`trigger-${k}`}><div>{k}</div></Tab>)}

@@ -14,7 +14,7 @@ export type Fields = {
 
 type FormContextType = {
   fields: Fields,
-  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void,
+  handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void,
   addFields: Function;
   deleteAField: Function;
 }
@@ -33,7 +33,7 @@ export const useFormContext = () => useContext(FormContext)
 export function FormContextProvider({ children }: { children: ReactNode }) {
   const [fields, setFields] = useState<Fields>({});
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     setFields({
       ...fields,
@@ -45,11 +45,13 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
   };
 
   const addFields = (fieldsValues: Field[]) => {
-    const newFields = {...fields}
-    fieldsValues.forEach(val => {
-      newFields[val.id] = val
+    setFields(_fields => {
+      const newFields = {..._fields}
+      fieldsValues.forEach(val => {
+        newFields[val.id] = val
+      })
+      return newFields
     })
-    setFields(newFields)
   }
 
   const deleteAField = (id: keyof Fields) => {

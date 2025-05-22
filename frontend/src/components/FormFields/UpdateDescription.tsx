@@ -2,22 +2,22 @@ import { useEffect } from "react";
 import { useFormContext } from "../../contexts/FormContext"
 
 export default function() {
-  const { fields, handleInputChange, addFields } = useFormContext();
+  const { handleInputChange, addFields } = useFormContext();
 
   const field = {
-    name: '',
+    name: 'update-desc',
     value: '',
-    label: '',
+    label: 'Update',
     required: true,
-    id: ''
+    id: 'update-desc'
   }
 
   useEffect(() => {
-    addFields(field)
+    addFields([field])
   }, [])
 
   return <>
     <label className="usa-label" htmlFor={field.id}>{field.label}</label>
-    <input className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} value={fields[field.id].value} />
+    <textarea className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} />
   </>
 }
