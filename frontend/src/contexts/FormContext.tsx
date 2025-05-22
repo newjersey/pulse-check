@@ -30,8 +30,8 @@ const { Provider } = FormContext;
 
 export const useFormContext = () => useContext(FormContext)
 
-export function FormContextProvider({ children, initialFields }: { children: ReactNode; initialFields: Fields }) {
-  const [fields, setFields] = useState(initialFields);
+export function FormContextProvider({ children }: { children: ReactNode }) {
+  const [fields, setFields] = useState<Fields>({});
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target;

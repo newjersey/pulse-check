@@ -1,56 +1,32 @@
-import { useParams } from "react-router";
 import PageTemplate from "../../components/PageTemplate";
 import { useDataContext } from "../../contexts/DataContext";
-import { Fields, FormContextProvider } from "../../contexts/FormContext";
-// import SubmitUpdateFields from "./SubmitUpdateFields";
+import { FormContextProvider } from "../../contexts/FormContext";
+import { UpdateDescription } from "../../components/FormFields";
+import useProject from "../../utils/useProject";
+import LayoutContainer from "../../components/LayoutContainer";
 
 export default function () {
-  const { projects, loading } = useDataContext();
-  const { projectId } = useParams();
-  const project = projectId && projects ? projects[projectId] : undefined
+  const { loading } = useDataContext();
+  const { project } = useProject()
 
   if (loading || !project) {
-    return <PageTemplate title="Loading project...">
-      <></>
-    </PageTemplate>
+    return <LayoutContainer>
+      <PageTemplate title="Loading project...">
+        <></>
+      </PageTemplate>
+    </LayoutContainer>
   }
 
-  const formFields: Fields = {
-    updater: {
-      name: 'updater',
-      value: undefined,
-      label: 'Updater',
-      required: true,
-      id: 'updater'
-    }
-  }
-
-  // project.Deliverables?.forEach(m => {
-  //   const mostRecent = m["Milestone updates"]?.[0]
-  //   if (mostRecent?.Status === 'Done' || mostRecent?.Status === 'Canceled') { return }
-
-  //   formFields[`${m.id}-description`] = {
-  //     name: `${m.id}-description`,
-  //     id: `${m.id}-description`,
-  //     value: '',
-  //     label: 'Update description',
-  //     required: true
-  //   }
-  //   formFields[`${m.id}-status`] = {
-  //     name: `${m.id}-status`,
-  //     id: `${m.id}-status`,
-  //     value: m["Milestone updates"]?.[0].Status,
-  //     label: 'Status',
-  //     required: true
-  //   }
-  // })
-
-  return <PageTemplate title={`Submit an update for ${project.Name}`}>
-    <FormContextProvider initialFields={formFields}>
-      <form>
-        <>Project details</>
-        {/* <SubmitUpdateFields project={project}/> */}
-      </form>
-    </FormContextProvider>
-  </PageTemplate>
+  return (
+    <LayoutContainer>
+      <PageTemplate title={`Submit an update for ${project.Name}`}>
+        <FormContextProvider>
+          <form>
+            <>Project details</>
+            <UpdateDescription />
+          </form>
+        </FormContextProvider>
+      </PageTemplate>
+    </LayoutContainer>
+  )
 }
