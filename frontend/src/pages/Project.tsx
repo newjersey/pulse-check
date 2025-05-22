@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { Link, useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
 import { useDataContext } from "../contexts/DataContext";
 import { useMemo } from "react";
@@ -72,7 +72,7 @@ export default function () {
                   </td>
                   <td>
                     <div
-                      className={`usa-alert flex-1 margin-y-0 padding-2 ${updateStatusValues[u.Status]?.class}`}
+                      className={`usa-alert flex-1 margin-y-0 padding-1 ${updateStatusValues[u.Status]?.class}`}
                       key={`${project.id}-${u.Status}`}
                     >
                       <div>{u.Status}</div>

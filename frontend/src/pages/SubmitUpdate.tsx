@@ -48,6 +48,7 @@ export default function () {
   return <PageTemplate title={`Submit an update for ${project.Name}`}>
     <FormContextProvider initialFields={formFields}>
       <form>
+        <>Project details</>
         {/* <SubmitUpdateFields project={project}/> */}
       </form>
     </FormContextProvider>
