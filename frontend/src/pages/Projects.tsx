@@ -48,11 +48,12 @@ export default function () {
         <TabPanels>
           {Object.keys(activeProjectsByInitiative).map(k =>
           (<TabPanel key={k}>
-            {activeProjectsByInitiative[k].projects.map(p => {
+            {activeProjectsByInitiative[k].projects.length === 0 ?
+            <p className='margin-y-4'>{`No projects for ${k} yet`}</p> :
+            activeProjectsByInitiative[k].projects.map(p => {
               // return search === '?view=timeline' ? <ProjectMilestoneTimeline key={p.id} project={p} /> : <ProjectRow key={p.id} project={p} />
               return <ProjectRow key={p.id} project={p} />
             })}
-            {activeProjectsByInitiative[k].projects.length === 0 && <p className='margin-y-4'>{`No projects for ${k} yet`}</p>}
           </TabPanel>)
           )}
         </TabPanels>

@@ -25,7 +25,7 @@ export default function () {
     <select className="usa-select" name={field.name} id={field.id} required={field.required} onChange={handleInputChange} defaultValue={field.value}>
       <option value={undefined}>- Choose a project -</option>
       {projects && Object.keys(projects).map(key => (
-        <option value={key}>{projects[key]?.Name}</option>
+        <option value={key} key={key}>{projects[key]?.Name}</option>
       ))}
     </select>
   </>

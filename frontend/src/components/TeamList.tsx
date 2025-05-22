@@ -9,7 +9,7 @@ export default function ({ project }: { project: Project }) {
 
   return <ul>
     {team.map(person => {
-      return <li>{person.Name}</li>
+      return <li key={person.id}>{person.Name}</li>
     })}
   </ul>
 

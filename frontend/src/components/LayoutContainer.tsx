@@ -28,13 +28,13 @@ export default ({ children }: { children: ReactNode }) => {
             </button>
             <ul className='usa-nav__primary usa-accordion'>
               <li className='usa-nav__primary-item'>
+                <Link className="usa-nav-link" to={{ pathname: `/projects/update`, search: projectId ? `?projectId=${projectId}` : undefined }}>Add update</Link>
+              </li>
+              <li className='usa-nav__primary-item'>
                 <Link className="usa-nav-link" to={`/projects/new`}>Add project</Link>
               </li>
               <li className='usa-nav__primary-item'>
                 <Link className="usa-nav-link" to={{ pathname: `/projects/edit`, search: projectId ? `?projectId=${projectId}` : undefined }}>Edit project</Link>
-              </li>
-              <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={{ pathname: `/projects/update`, search: projectId ? `?projectId=${projectId}` : undefined }}>Add update</Link>
               </li>
             </ul>
           </nav>

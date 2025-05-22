@@ -4,6 +4,7 @@ import { useDataContext } from "../contexts/DataContext";
 import { getSortedProjectUpdates, hydrateIdList, updateStatusValues } from "../utils/projectUtils";
 import { useMemo } from "react";
 import TeamList from "./TeamList";
+import React from "react";
 
 export default function ({ project }: { project: Project }) {
   const { updates, needs, needsTypes } = useDataContext();
@@ -39,10 +40,10 @@ export default function ({ project }: { project: Project }) {
 
     <div className="grid-col-2">
       {currentNeeds && <dl className="margin-0">
-        {currentNeeds.map(n => <>
+        {currentNeeds.map(n => <React.Fragment key={n.id}>
           <dt className="text-bold">{n["Project need type"].Need}</dt>
           <dd className="margin-0">{n.Description}</dd>
-        </>)}
+        </React.Fragment>)}
       </dl>}
     </div>
 

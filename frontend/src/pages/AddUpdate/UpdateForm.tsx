@@ -3,6 +3,8 @@ import { useFormContext } from "../../contexts/FormContext";
 import { UpdateDescription } from "../../components/FormFields";
 import ProjectField from "../../components/FormFields/ProjectField";
 import UpdateStatus from "../../components/FormFields/UpdateStatus";
+import MetricUpdates from "../../components/FormFields/MetricUpdates";
+import ProjectNeeds from "../../components/FormFields/ProjectNeeds";
 
 
 export default function () {
@@ -18,7 +20,9 @@ export default function () {
   return <form>
     <ProjectField />
     <UpdateDescription />
-    <UpdateStatus/>
+    <UpdateStatus />
+    <MetricUpdates />
+    <ProjectNeeds />
     <input type="submit" className="usa-button margin-y-4" value="Submit" onClick={onSubmit} />
   </form>
 }

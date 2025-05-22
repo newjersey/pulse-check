@@ -115,13 +115,13 @@ export type MetricType = {
 
 export type NeedType = {
   id: string;
-  Need: string;
+  Type: string;
 }
 
 export type Need = {
   id: string;
   Project: string[];
-  "Project need type": string[];
+  "Project need type": NeedType["id"][];
   Description: string;
 }
 

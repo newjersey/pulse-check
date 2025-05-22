@@ -22,7 +22,7 @@ export default function() {
     <select className="usa-select" name={field.name} id={field.id} required={field.required} onChange={handleInputChange} defaultValue={field.value}>
       <option value={undefined}>- Choose a status -</option>
       {statusValues.map(value => (
-        <option value={value}>{value}</option>
+        <option value={value} key={value}>{value}</option>
       ))}
     </select>
   </>
