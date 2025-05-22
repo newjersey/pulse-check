@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router";
+import { useParams } from "react-router";
 import PageTemplate from "../components/PageTemplate";
 import { useDataContext } from "../contexts/DataContext";
 import { useMemo } from "react";

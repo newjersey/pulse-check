@@ -1,7 +1,7 @@
 import { useParams } from "react-router";
-import PageTemplate from "../components/PageTemplate";
-import { useDataContext } from "../contexts/DataContext";
-import { Fields, FormContextProvider } from "../contexts/FormContext";
+import PageTemplate from "../../components/PageTemplate";
+import { useDataContext } from "../../contexts/DataContext";
+import { Fields, FormContextProvider } from "../../contexts/FormContext";
 // import SubmitUpdateFields from "./SubmitUpdateFields";
 
 export default function () {

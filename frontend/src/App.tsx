@@ -1,16 +1,19 @@
-import { Routes, Route, Link, useParams } from 'react-router';
+import { Routes, Route, Link } from 'react-router';
 import Projects from './pages/Projects';
 import './App.css'
-import SubmitUpdate from './pages/SubmitUpdate';
+import SubmitUpdate from './pages/AddUpdate/AddUpdate';
 import { DataContextProvider } from './contexts/DataContext';
 import Login from './pages/Login';
 import Project from './pages/Project';
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
+import EditProject from './pages/EditProject/EditProject';
 
 function App() {
-  const { projectId } = useParams()
-  const editUpdateId = projectId ?? 'tbd';
-  // TODO USE QUERY PARAM INSTEAD
+  let projectId = 'tbd';
+  const locationHash = window.location.hash.split('/')
+  if (locationHash[1] === 'projects') {
+    projectId = locationHash[2]
+  }
 
   return (
     <DataContextProvider>
@@ -32,13 +35,13 @@ function App() {
             </button>
             <ul className='usa-nav__primary usa-accordion'>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={`/projects/new/edit`}>Add project</Link>
+                <Link className="usa-nav-link" to={`/projects/new`}>Add project</Link>
               </li>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={`/projects/${editUpdateId}/edit`}>Edit project</Link>
+                <Link className="usa-nav-link" to={{ pathname: `/projects/edit`, search: `?projectId=${projectId}` }}>Edit project</Link>
               </li>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={`/projects/${editUpdateId}/update`}>Add update</Link>
+                <Link className="usa-nav-link" to={{ pathname: `/projects/update`, search: `?projectId=${projectId}` }}>Add update</Link>
               </li>
             </ul>
           </nav>
@@ -50,8 +53,9 @@ function App() {
           <Route path="/" element={<Projects />} />
           <Route path="/projects" element={<Projects />} />
           <Route path="/projects/:projectId" element={<Project />} />
-          <Route path="/projects/:projectId/edit" element={<SubmitUpdate />} />
-          <Route path="/projects/:projectId/update" element={<SubmitUpdate />} />
+          <Route path="/projects/new" element={<EditProject />} />
+          <Route path="/projects/edit" element={<EditProject />} />
+          <Route path="/projects/update" element={<SubmitUpdate />} />
         </Routes>
       </main>
     </DataContextProvider>
