@@ -41,7 +41,7 @@ export default function ({ project }: { project: Project }) {
     <div className="grid-col-2">
       {currentNeeds && <dl className="margin-0">
         {currentNeeds.map(n => <React.Fragment key={n.id}>
-          <dt className="text-bold">{n["Project need type"].Need}</dt>
+          <dt className="text-bold">{n["Project need type"].Type}</dt>
           <dd className="margin-0">{n.Description}</dd>
         </React.Fragment>)}
       </dl>}
