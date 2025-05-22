@@ -2,6 +2,7 @@ import { useDataContext } from "../../contexts/DataContext";
 import { useFormContext } from "../../contexts/FormContext";
 import { UpdateDescription } from "../../components/FormFields";
 import ProjectField from "../../components/FormFields/ProjectField";
+import UpdateStatus from "../../components/FormFields/UpdateStatus";
 
 
 export default function () {
@@ -17,6 +18,7 @@ export default function () {
   return <form>
     <ProjectField />
     <UpdateDescription />
+    <UpdateStatus/>
     <input type="submit" className="usa-button margin-y-4" value="Submit" onClick={onSubmit} />
   </form>
 }

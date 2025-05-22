@@ -18,6 +18,6 @@ export default function() {
 
   return <>
     <label className="usa-label" htmlFor={field.id}>{field.label}</label>
-    <textarea className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} />
+    <textarea className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} style={{ minHeight: '6em' }}/>
   </>
 }
