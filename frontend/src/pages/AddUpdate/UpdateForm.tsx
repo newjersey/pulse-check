@@ -50,9 +50,8 @@ export default function () {
     return <>Yay you did it!</>
   }
 
-  // TODO HANDLE ERROR
-
   return <form onSubmit={(e) => {e.preventDefault()}}>
+    {/* TODO: ACTUAL ALERT COMPONENT */}
     {error && <p>Oh no, an error!</p>}
     <ProjectField />
     {projectId && <React.Fragment key={projectId}>

@@ -3,6 +3,7 @@ import { ReactNode} from 'react';
 import { Link } from 'react-router';
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
 import useProject from '../utils/useProject';
+import ErrorBoundary from './ErrorBoundary';
 
 
 export default ({ children }: { children: ReactNode }) => {
@@ -41,7 +42,9 @@ export default ({ children }: { children: ReactNode }) => {
         </div>
       </header>
       <main id="main-content" className="grid-container">
-        {children}
+        <ErrorBoundary>
+          {children}
+        </ErrorBoundary>
       </main>
     </>
   )
