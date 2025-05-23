@@ -1,6 +1,6 @@
 import { useDataContext } from "../../contexts/DataContext";
 import { useFormContext } from "../../contexts/FormContext";
-import { Deliverables, MetricUpdates, PhaseChangeDate, ProjectField, ProjectNeeds, ProjectPhase, UpdateDescription, UpdateStatus } from "../../components/FormFields";
+import { ProjectField, UpdateDescription, UpdateStatus } from "../../components/FormFields";
 import useProject from "../../utils/useProject";
 import React, { useState } from "react";
 
@@ -53,6 +53,7 @@ export default function () {
   // TODO HANDLE ERROR
 
   return <form onSubmit={(e) => {e.preventDefault()}}>
+    {error && <p>Oh no, an error!</p>}
     <ProjectField />
     {projectId && <React.Fragment key={projectId}>
       <UpdateDescription />

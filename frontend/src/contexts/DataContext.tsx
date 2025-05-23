@@ -46,26 +46,27 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [needsTypes, setNeedsTypes] = useState<RecordByIdType<NeedType>>()
   const [needs, setNeeds] = useState<RecordByIdType<Need>>()
 
-  useEffect(() => {
-    const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `${apiURL}/api/${endpoint}`,
-          { headers: { Authorization: 'Basic ' + authToken } }
-        );
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const result = await response.json();
-        setData(result.data);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setRefreshData(false);
-        setLoading(false);
+  const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${apiURL}/api/${endpoint}`,
+        { headers: { Authorization: 'Basic ' + authToken } }
+      );
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
       }
-    };
+      const result = await response.json();
+      setData(result.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setRefreshData(false);
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     if (authToken) {
       fetchData('projects', setProjects);
       fetchData('people', setPeople);
