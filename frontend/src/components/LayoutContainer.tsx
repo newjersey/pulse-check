@@ -1,5 +1,5 @@
 
-import { ReactNode } from 'react';
+import { ReactNode, useRef } from 'react';
 import { Link } from 'react-router';
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
 import useProject from '../utils/useProject';
@@ -8,16 +8,22 @@ import ErrorBoundary from './ErrorBoundary';
 
 export default ({ children }: { children: ReactNode }) => {
   const { projectId } = useProject()
+  const mainContentRef = useRef<HTMLElement | null>(null);
+  function skipNavClick(e: { preventDefault: () => void; }) {
+    e.preventDefault()
+    if (!mainContentRef.current) { return }
+    mainContentRef.current.focus()
+  }
 
   return (
     <>
       <header className="usa-header usa-header--basic">
-        <a className="usa-skipnav" href="#main-content">Skip to main content</a>
+        <a className="usa-skipnav" href="#" onClick={skipNavClick}>Skip to main content</a>
         <div className='usa-nav-container'>
           <div className="usa-navbar">
             <div className="usa-logo site-logo">
               <Link to="/" className="usa-logo__text site-logo__text display-flex flex-align-center">
-                <img src="../../public/logo.png" className='margin-right-1' style={{ minHeight: '2em' }}/>
+                <img src="../../public/logo.png" className='margin-right-1' style={{ height: '2em' }}/>
                 <span>
                   Project tracker dashboard
                 </span>
@@ -46,7 +52,7 @@ export default ({ children }: { children: ReactNode }) => {
           </nav>
         </div>
       </header>
-      <main id="main-content" className="grid-container">
+      <main className="grid-container" ref={mainContentRef} tabIndex={-1}>
         <ErrorBoundary>
           {children}
         </ErrorBoundary>
