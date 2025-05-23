@@ -1,6 +1,6 @@
 
 import { ReactNode, useRef } from 'react';
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
 import useProject from '../utils/useProject';
 import ErrorBoundary from './ErrorBoundary';
@@ -14,6 +14,8 @@ export default ({ children }: { children: ReactNode }) => {
     if (!mainContentRef.current) { return }
     mainContentRef.current.focus()
   }
+
+  const { pathname } = useLocation()
 
   return (
     <>
@@ -40,13 +42,13 @@ export default ({ children }: { children: ReactNode }) => {
             </button>
             <ul className='usa-nav__primary usa-accordion'>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={{ pathname: `/projects/update`, search: projectId ? `?projectId=${projectId}` : undefined }}>Add update</Link>
+                <Link className={`usa-nav-link${pathname === '/projects/update' ? ' usa-current' : ''}`} to={{ pathname: `/projects/update`, search: projectId ? `?projectId=${projectId}` : undefined }}>Add update</Link>
               </li>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={`/projects/new`}>Add project</Link>
+                <Link className={`usa-nav-link${pathname === '/projects/new' ? ' usa-current' : ''}`} to={`/projects/new`}>Add project</Link>
               </li>
               <li className='usa-nav__primary-item'>
-                <Link className="usa-nav-link" to={{ pathname: `/projects/edit`, search: projectId ? `?projectId=${projectId}` : undefined }}>Edit project</Link>
+                <Link className={`usa-nav-link${pathname === '/projects/edit' ? ' usa-current' : ''}`} to={{ pathname: `/projects/edit`, search: projectId ? `?projectId=${projectId}` : undefined }}>Edit project</Link>
               </li>
             </ul>
           </nav>

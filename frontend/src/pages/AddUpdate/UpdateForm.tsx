@@ -62,7 +62,7 @@ export default function () {
       <ProjectPhase />
       <PhaseChangeDate />
       <Deliverables /> */}
+      <button className="usa-button margin-y-4" onClick={onSubmit}>Submit</button>
     </React.Fragment>}
-    <button className="usa-button margin-y-4" onClick={onSubmit}>Submit</button>
   </form>
 }
