@@ -1,5 +1,5 @@
 
-import { ReactNode} from 'react';
+import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import imageUrl from "@newjersey/njwds/dist/img/sprite.svg";
 import useProject from '../utils/useProject';
@@ -15,8 +15,13 @@ export default ({ children }: { children: ReactNode }) => {
         <a className="usa-skipnav" href="#main-content">Skip to main content</a>
         <div className='usa-nav-container'>
           <div className="usa-navbar">
-            <div className="usa-logo">
-              <Link to="/" className="usa-logo__text">Project tracker dashboard</Link>
+            <div className="usa-logo site-logo">
+              <Link to="/" className="usa-logo__text site-logo__text display-flex flex-align-center">
+                <img src="../../public/logo.png" className='margin-right-1' style={{ minHeight: '2em' }}/>
+                <span>
+                  Project tracker dashboard
+                </span>
+              </Link>
             </div>
             <button className='usa-menu-btn'>Menu</button>
           </div>
