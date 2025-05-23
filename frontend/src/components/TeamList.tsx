@@ -7,6 +7,10 @@ export default function ({ project }: { project: Project }) {
   const { people } = useDataContext();
   const team = useMemo(() => hydrateIdList(project.Team, people), [people])
 
+  if (!team?.length) {
+    return <></>
+  }
+
   return <ul>
     {team.map(person => {
       return <li key={person.id}>{person.Name}</li>

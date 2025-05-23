@@ -7,6 +7,7 @@ import ProjectRow from '../components/ProjectRow';
 // import ProjectMilestoneTimeline from '../components/ProjectMilestoneTimeline';
 import { Initiative, Project } from '../utils/types';
 import LayoutContainer from '../components/LayoutContainer';
+import ProjectTable from '../components/ProjectTable';
 
 export default function () {
   const { projects } = useDataContext();
@@ -50,10 +51,7 @@ export default function () {
           (<TabPanel key={k}>
             {activeProjectsByInitiative[k].projects.length === 0 ?
             <p className='margin-y-4'>{`No projects for ${k} yet`}</p> :
-            activeProjectsByInitiative[k].projects.map(p => {
-              // return search === '?view=timeline' ? <ProjectMilestoneTimeline key={p.id} project={p} /> : <ProjectRow key={p.id} project={p} />
-              return <ProjectRow key={p.id} project={p} />
-            })}
+            <ProjectTable projects={activeProjectsByInitiative[k].projects}/>}
           </TabPanel>)
           )}
         </TabPanels>

@@ -17,18 +17,24 @@ export default function ({ project }: { project: Project }) {
       .map(n => ({ ...n, "Project need type": needsTypes[n["Project need type"][0]] }))
   }, [needs, needsTypes])
 
-  return (<div className="grid-row margin-y-6 grid-gap">
-    <div className="grid-col-3">
-      <Link className="margin-0" to={`/projects/${project["id"]}`}>{project["Name"]}</Link>
-      <p className="margin-0">{project["Phase"]}</p>
-      <TeamList project={project}/>
-    </div>
+  return (<tr>
+    <th scope="row" className="usa-sr-only">
+      {project.Name}
+    </th>
 
-    <div className="grid-col-2">
+    <td style={{ padding: '1.5rem 1rem' }}>
+      <div>
+        <Link className="margin-0 font-heading-lg" to={`/projects/${project["id"]}`}>{project["Name"]}</Link>
+        <p className="margin-0">{project["Phase"]}</p>
+        <TeamList project={project} />
+      </div>
+    </td>
+
+    <td style={{ padding: '1.5rem 1rem' }}>
       Progress TBD
-    </div>
+    </td>
 
-    <div className="grid-col-2">
+    <td style={{ padding: '1.5rem 1rem' }}>
       {mostRecentUpdate?.Status &&
         <div
           className={`usa-alert flex-1 margin-y-0 padding-2 ${updateStatusValues[mostRecentUpdate.Status]?.class}`}
@@ -36,18 +42,18 @@ export default function ({ project }: { project: Project }) {
         >
           <div>{mostRecentUpdate.Status}</div>
         </div>}
-    </div>
+    </td>
 
-    <div className="grid-col-2">
+    <td style={{ padding: '1.5rem 1rem' }}>
       {currentNeeds && <dl className="margin-0">
         {currentNeeds.map(n => <React.Fragment key={n.id}>
           <dt className="text-bold">{n["Project need type"].Type}</dt>
           <dd className="margin-0">{n.Description}</dd>
         </React.Fragment>)}
       </dl>}
-    </div>
+    </td>
 
-    <div className="grid-col-3">
+    <td style={{ padding: '1.5rem 1rem' }}>
       {mostRecentUpdate && <>
         <p>
           {mostRecentUpdate?.Description}
@@ -57,6 +63,6 @@ export default function ({ project }: { project: Project }) {
         </p>
       </>
       }
-    </div>
-  </div>)
+    </td>
+  </tr>)
 }
