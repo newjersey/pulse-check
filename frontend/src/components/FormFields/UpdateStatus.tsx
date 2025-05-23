@@ -6,11 +6,12 @@ export default function() {
   const { handleInputChange, addFields } = useFormContext();
 
   const field = {
-    name: 'update-status',
+    name: 'projectStatus',
     value: '',
     label: 'Overall project status',
     required: true,
-    id: 'update-status'
+    id: 'projectStatus',
+    formKey: "projectStatus"
   }
 
   useEffect(() => {

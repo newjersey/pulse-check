@@ -16,7 +16,8 @@ export default function () {
     value: projectId || undefined,
     label: 'Project',
     required: true,
-    id: 'project'
+    id: 'project',
+    formKey: 'project'
   }
 
   useEffect(() => {

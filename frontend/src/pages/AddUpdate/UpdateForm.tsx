@@ -1,32 +1,68 @@
 import { useDataContext } from "../../contexts/DataContext";
 import { useFormContext } from "../../contexts/FormContext";
-import { UpdateDescription } from "../../components/FormFields";
-import ProjectField from "../../components/FormFields/ProjectField";
-import UpdateStatus from "../../components/FormFields/UpdateStatus";
-import MetricUpdates from "../../components/FormFields/MetricUpdates";
-import ProjectNeeds from "../../components/FormFields/ProjectNeeds";
+import { Deliverables, MetricUpdates, PhaseChangeDate, ProjectField, ProjectNeeds, ProjectPhase, UpdateDescription, UpdateStatus } from "../../components/FormFields";
 import useProject from "../../utils/useProject";
-import React from "react";
+import React, { useState } from "react";
 
 
 export default function () {
-  const { postData } = useDataContext();
+  const { loadingResponse, postData } = useDataContext();
   const { fields } = useFormContext();
   const { projectId } = useProject();
+  const [error, setError] = useState<string>();
+  const [success, setSuccess] = useState(false);
 
-  function onSubmit(e: any) {
+  async function onSubmit(e: any) {
     e.preventDefault();
-    postData('update', fields)
+    try {
+      const data = {
+        updates: {
+          projectId: fields.project.value,
+          updateDetails: fields.updateDetails.value,
+          projectStatus: fields.projectStatus.value,
+        }
+        // phase: ProjectPhase[number]String,
+        // metricUpdates: {}[]String,
+        // projectNeeds: {}[]String,
+        // phaseChangeDate: String,
+        // deliverables: {}[]String,
+      }
+      const response = await postData('update', data)
+      const newUpdate = await response.json();
+      if (response.status === 200) {
+        // TODO ADD UPDATE TO UPDATES
+        console.log(newUpdate)
+        setSuccess(true)
+        return
+      }
+      throw new Error("Response was not ok")
+    } catch (e) {
+      console.log(e)
+      setError("Could not update project :(")
+    }
   }
 
-  return <form onSubmit={() => { }}>
+  if (loadingResponse) {
+    return <>Loading...</>
+  }
+
+  if (success) {
+    return <>Yay you did it!</>
+  }
+
+  // TODO HANDLE ERROR
+
+  return <form onSubmit={(e) => {e.preventDefault()}}>
     <ProjectField />
     {projectId && <React.Fragment key={projectId}>
       <UpdateDescription />
       <UpdateStatus />
-      <MetricUpdates />
+      {/* <MetricUpdates />
       <ProjectNeeds />
+      <ProjectPhase />
+      <PhaseChangeDate />
+      <Deliverables /> */}
     </React.Fragment>}
-    <input type="submit" className="usa-button margin-y-4" value="Submit" onClick={onSubmit} />
+    <button className="usa-button margin-y-4" onClick={onSubmit}>Submit</button>
   </form>
 }

@@ -20,14 +20,16 @@ export default function () {
         value: needsTypes[n["Project need type"][0]].id,
         label: "Need type",
         required: true,
-        id: `${n.id}-type`
+        id: `${n.id}-type`,
+        formKey: "projectNeeds"
       },
       {
         name: `${n.id}-desc`,
         value: n.Description,
         label: "Details",
         required: true,
-        id: `${n.id}-desc`
+        id: `${n.id}-desc`,
+        formKey: "projectNeeds"
       }
     ]))
   }, [project, needs])

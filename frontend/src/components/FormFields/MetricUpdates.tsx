@@ -18,7 +18,8 @@ export default function () {
       value: undefined,
       label: m.Name,
       required: true,
-      id: `${m.id}-metric`
+      id: `${m.id}-metric`,
+      formKey: 'metricTypes'
     }))
   }, [project, metricTypes])
 

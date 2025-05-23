@@ -133,6 +133,7 @@ export type DataContextType = {
   authToken: string | null;
   setAuthToken: Function;
   loading: Boolean;
+  loadingResponse: Boolean;
   projects: RecordByIdType<Project> | undefined;
   people: RecordByIdType<Person> | undefined;
   updates: RecordByIdType<ProjectUpdate> | undefined;
@@ -144,4 +145,59 @@ export type DataContextType = {
   needsTypes: RecordByIdType<NeedType> | undefined;
   needs: RecordByIdType<Need> | undefined;
   postData: (endpoint: string, data: any) => any;
+}
+
+// const tableNames = {
+//   projects: 'Projects',
+//   people: 'People',
+//   updates: 'Project updates',
+//   deliverables: 'Deliverables',
+//   technologies: 'Technologies',
+//   organizations: 'Organizations',
+//   metrics_updates: 'Metrics updates',
+//   metric_types: 'Metric types',
+//   needs_types: 'Project needs types',
+//   needs: 'Current project needs'
+// }
+
+export type ProjectEditForm = {
+  projectId: string;
+  projectName?: string;
+  projectDesc?: string;
+  initiative?: Initiative[number];
+  team?: string[];
+  partners?: string[];
+  technologies?: string[];
+  metricTypes?: string[];
+  roadmapLink?: string;
+  phase?: ProjectPhase[number];
+  phaseChangeDate?: string;
+  deliverables?: {
+    [id: string]: Deliverable
+  };
+}
+
+export type ProjectAddForm = {
+  projectName: string;
+  projectDesc: string;
+  initiative: Initiative[number];
+  team: string[];
+  partners: string[];
+  technologies: string[];
+  metricTypes: string[];
+  roadmapLink: string;
+  phase: ProjectPhase[number];
+  phaseChangeDate: string;
+  deliverables?: {}[];
+}
+
+export type UpdateForm = {
+  projectId: string;
+  updateDetails: string;
+  projectStatus: StatusValues[number];
+  metricUpdates: {}[];
+  projectNeeds: {}[];
+  phase: ProjectPhase[number];
+  phaseChangeDate: string;
+  deliverables: {}[];
 }

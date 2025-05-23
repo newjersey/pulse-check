@@ -1,4 +1,5 @@
 import { ChangeEvent, createContext, ReactNode, useContext, useState } from 'react'
+// import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
 type Field = {
   name: string;
@@ -6,6 +7,7 @@ type Field = {
   label: string;
   required: boolean | undefined;
   id: string;
+  formKey: string; // TODO keyof ProjectAddForm | ProjectEditForm | UpdateForm;
 }
 
 export type Fields = {
@@ -15,15 +17,15 @@ export type Fields = {
 type FormContextType = {
   fields: Fields,
   handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void,
-  addFields: Function;
+  addFields: (fields: Field[]) => void;
   deleteAField: Function;
 }
 
 const FormContext = createContext<FormContextType>({
   fields: {},
-  handleInputChange: () => {},
-  addFields: () => {},
-  deleteAField: () => {}
+  handleInputChange: () => { },
+  addFields: () => { },
+  deleteAField: () => { },
 });
 
 const { Provider } = FormContext;
@@ -35,20 +37,21 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
-    setFields({
+    const field = fields[id]
+    setFields(_fields => ({
       ...fields,
       [id]: {
-        ...fields[id],
+        ...field,
         value
       },
-    });
+    }));
   };
 
-  const addFields = (fieldsValues: Field[]) => {
+  const addFields = (fieldsToAdd: Field[]) => {
     setFields(_fields => {
-      const newFields = {..._fields}
-      fieldsValues.forEach(val => {
-        newFields[val.id] = val
+      const newFields = { ..._fields }
+      fieldsToAdd.forEach(newField => {
+        newFields[newField.id] = newField
       })
       return newFields
     })

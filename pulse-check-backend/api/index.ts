@@ -65,13 +65,17 @@ app.get('/api/:record_type', async c => {
   return c.json({ data, status: 200 })
 })
 
-app.post('/api/update', async(c) => {
-  // get updater, new milestone updates, and new milestones
-  // create new milestones first - keep track of id from frontend + actual created id
-  // add updater to milestone updates
-  // then create updates, associating them with milestones (incl new ones)
-  console.log(await c.req.json())
-  return c.json({ status: 200 })
+app.post('/api/update', async (c) => {
+  const data = await c.req.json();
+  const response = await base(tableNames.updates).create({
+    "Description": data.updates.updateDetails,
+    "Status": data.updates.projectStatus,
+    "Project": [
+      data.updates.projectId
+    ],
+  })
+  c.status(200)
+  return c.json(response.fields)
 })
 
 serve({ fetch: app.fetch, port: 3001 })

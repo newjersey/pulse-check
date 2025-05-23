@@ -5,6 +5,7 @@ const DataContext = createContext<DataContextType>({
   authToken: null,
   setAuthToken: () => {},
   loading: false,
+  loadingResponse: false,
   projects: undefined,
   people: undefined,
   updates: undefined,
@@ -26,6 +27,7 @@ const apiURL = import.meta.env.DEV ? import.meta.env.VITE_DEV_ENDPOINT : import.
 
 export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
+  const [loadingResponse, setLoadingResponse] = useState(false);
   const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
   const [refreshData, setRefreshData] = useState(false)
   function setAuthToken(input: string) {
@@ -79,7 +81,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   }, [authToken, refreshData])
 
   async function postData(endpoint: string, data: any) {
-    setLoading(true)
+    setLoadingResponse(true)
     try {
       const response = await fetch(
         `${apiURL}/api/${endpoint}`,
@@ -92,15 +94,16 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      setRefreshData(true);
+      // setRefreshData(true); TODO FIGURE THIS OUT
+      return response
     } catch (error) {
       console.error(error);
     } finally {
-      setLoading(false);
+      setLoadingResponse(false);
     }
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
+  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
     {children}
   </Provider>
 }
