@@ -74,8 +74,14 @@ app.post('/api/update', async (c) => {
       data.updates.projectId
     ],
   })
+  const projectReponse = await base(tableNames.projects).update([{
+    id: data.updates.projectId,
+    fields: {
+      Phase: data.updates.phase
+    }
+  }])
   c.status(200)
-  return c.json(response.fields)
+  return c.json({ ...response.fields, ...projectReponse.fields })
 })
 
 serve({ fetch: app.fetch, port: 3001 })
