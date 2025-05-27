@@ -23,7 +23,6 @@ export default function () {
           phase: fields.projectPhase.value,
           phaseChangeDate: fields.phaseChangeDate.value,
         }
-        // phase: ProjectPhase[number]String,
         // metricUpdates: {}[]String,
         // projectNeeds: {}[]String,
         // deliverables: {}[]String,

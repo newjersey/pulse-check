@@ -7,7 +7,7 @@ import { cors } from 'hono/cors'
 import { cache } from 'hono/cache'
 import * as dotenv from "dotenv";
 import Airtable = require('airtable');
-import { AirtableRecord, fetchLinkedRecords, getAllRecords, getAllRecordsById, TableNameKey, tableNames } from './utils'
+import { getAllRecordsById, TableNameKey, tableNames } from './utils'
 
 const env = dotenv.config({ path: "./.env" }).parsed;
 const FRONTEND_URL = process.env.FRONTEND_URL || env?.FRONTEND_URL || ''
