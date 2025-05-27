@@ -21,7 +21,7 @@ export default function () {
       id: `${m.id}-metric`,
       formKey: 'metricUpdates',
       foreignKeys: {
-        'Metric Type': m.id
+        'Metric type': m.id
       }
     }))
   }, [project, metricTypes])

@@ -81,14 +81,18 @@ app.post('/api/update', async (c) => {
       'Anticipated phase change': data.updates.phaseChangeDate
     }
   }])
-  const metricUpdates = data.updates.metricUpdates.map((m: { foreignKeys: { [x: string]: any; Project: any }; value: any }) => ({
-    Project: data.updates.projectId,
-    Value: m.value,
-    'Metric Type': [m.foreignKeys['Metric Type']]
-  }))
+  const metricUpdates = data.updates.metricUpdates.map(
+    (m: { foreignKeys: { [x: string]: any; Project: any }; value: any }) => ({
+      fields: {
+        Project: [data.updates.projectId],
+        Value: m.value,
+        "Metric type": [m.foreignKeys?.['Metric type']]
+      }
+    })
+  )
   const metricUpdatesResponse = await base(tableNames.metrics_updates).create(metricUpdates)
   c.status(200)
-  return c.json({ ...response.fields, ...projectReponse.fields, ...metricUpdatesResponse })
+  return c.json({ ...response.fields, ...projectReponse.fields, ...metricUpdatesResponse.fields })
 })
 
 serve({ fetch: app.fetch, port: 3001 })
