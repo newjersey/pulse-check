@@ -77,7 +77,8 @@ app.post('/api/update', async (c) => {
   const projectReponse = await base(tableNames.projects).update([{
     id: data.updates.projectId,
     fields: {
-      Phase: data.updates.phase
+      Phase: data.updates.phase,
+      'Anticipated phase change': data.updates.phaseChangeDate
     }
   }])
   c.status(200)
