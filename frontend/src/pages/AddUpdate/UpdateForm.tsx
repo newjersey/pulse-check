@@ -1,6 +1,6 @@
 import { useDataContext } from "../../contexts/DataContext";
 import { useFormContext } from "../../contexts/FormContext";
-import { ProjectField, UpdateDescription, UpdateStatus } from "../../components/FormFields";
+import { ProjectField, ProjectPhase, UpdateDescription, UpdateStatus } from "../../components/FormFields";
 import useProject from "../../utils/useProject";
 import React, { useState } from "react";
 
@@ -20,6 +20,7 @@ export default function () {
           projectId: fields.project.value,
           updateDetails: fields.updateDetails.value,
           projectStatus: fields.projectStatus.value,
+          phase: fields.projectPhase.value,
         }
         // phase: ProjectPhase[number]String,
         // metricUpdates: {}[]String,
@@ -57,9 +58,9 @@ export default function () {
     {projectId && <React.Fragment key={projectId}>
       <UpdateDescription />
       <UpdateStatus />
+      <ProjectPhase />
       {/* <MetricUpdates />
       <ProjectNeeds />
-      <ProjectPhase />
       <PhaseChangeDate />
       <Deliverables /> */}
       <button className="usa-button margin-y-4" onClick={onSubmit}>Submit</button>
