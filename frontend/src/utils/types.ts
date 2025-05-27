@@ -96,8 +96,9 @@ export type Organization = {
 
 export type MetricUpdate = {
   id: string;
-  "Metric Type": string[];
+  "Metric type": string[];
   Value: string;
+  Created: string;
 }
 
 export const metricValueTypes = [

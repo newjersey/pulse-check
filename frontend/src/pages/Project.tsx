@@ -7,7 +7,7 @@ import useProject from "../utils/useProject";
 import LayoutContainer from "../components/LayoutContainer";
 
 export default function () {
-  const { deliverables, updates, loading } = useDataContext();
+  const { deliverables, updates, metricsUpdates, metricTypes, loading } = useDataContext();
   const { project } = useProject()
   const projectDeliverables = useMemo(() => hydrateIdList(project?.Deliverables, deliverables), [project, deliverables])
 
@@ -22,8 +22,9 @@ export default function () {
     </LayoutContainer>
   }
 
-  return <LayoutContainer>
+  console.log(project["Metrics updates"])
 
+  return <LayoutContainer>
     <PageTemplate title={project.Name}>
       <div className="grid-row">
         <div className="grid-col-4">
@@ -86,6 +87,35 @@ export default function () {
               </tbody>
             </table>) : <p>No milestones added yet</p>}
         </div>
+      </div>
+
+      <div>
+        <h2>Metrics updates</h2>
+        <table className="usa-table usa-table--borderless" style={{ width: '100%' }}>
+          <thead>
+            <tr>
+              <th scope="col">Metric</th>
+              <th scope="col">Value</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(project["Metrics updates"] || []).map((id) => {
+              const update = metricsUpdates?.[id]
+              if (!update) { return }
+              const metricTypeId = update["Metric type"][0]
+              const metricType = metricTypes?.[metricTypeId]
+              if (!metricType) { return }
+              return (
+                <tr>
+                  <td>{metricType.Name}</td>
+                  <td>{update.Value}</td>
+                  <td>{update.Created ? new Date(update.Created).toLocaleDateString() : ''}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
 
     </PageTemplate>
