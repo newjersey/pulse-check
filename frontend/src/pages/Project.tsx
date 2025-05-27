@@ -22,8 +22,6 @@ export default function () {
     </LayoutContainer>
   }
 
-  console.log(project["Metrics updates"])
-
   return <LayoutContainer>
     <PageTemplate title={project.Name}>
       <div className="grid-row">
