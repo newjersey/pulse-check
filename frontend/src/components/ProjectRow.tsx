@@ -59,7 +59,7 @@ export default function ({ project }: { project: Project }) {
           {mostRecentUpdate?.Description}
         </p>
         <p className="text-italic font-body-xs">
-          Updated {mostRecentUpdate?.Created}
+          Updated {mostRecentUpdate?.Created ? new Date(mostRecentUpdate.Created).toLocaleDateString() : ''}
         </p>
       </>
       }
