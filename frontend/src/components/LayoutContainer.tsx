@@ -25,7 +25,7 @@ export default ({ children }: { children: ReactNode }) => {
           <div className="usa-navbar">
             <div className="usa-logo site-logo">
               <Link to="/" className="usa-logo__text site-logo__text display-flex flex-align-center">
-                <img src="../../public/logo.png" className='margin-right-1' style={{ height: '2em' }}/>
+                <img src="/logo.png" className='margin-right-1' style={{ height: '2em' }}/>
                 <span>
                   Project tracker dashboard
                 </span>
