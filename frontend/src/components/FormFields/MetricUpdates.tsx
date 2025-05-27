@@ -19,7 +19,10 @@ export default function () {
       label: m.Name,
       required: true,
       id: `${m.id}-metric`,
-      formKey: 'metricTypes'
+      formKey: 'metricUpdates',
+      foreignKeys: {
+        'Metric Type': m.id
+      }
     }))
   }, [project, metricTypes])
 

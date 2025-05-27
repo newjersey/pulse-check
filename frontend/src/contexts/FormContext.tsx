@@ -8,6 +8,7 @@ type Field = {
   required: boolean | undefined;
   id: string;
   formKey: string; // TODO keyof ProjectAddForm | ProjectEditForm | UpdateForm;
+  foreignKeys?: object;
 }
 
 export type Fields = {
@@ -19,6 +20,7 @@ type FormContextType = {
   handleInputChange: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void,
   addFields: (fields: Field[]) => void;
   deleteAField: Function;
+  fieldsByFormKey: Function;
 }
 
 const FormContext = createContext<FormContextType>({
@@ -26,6 +28,7 @@ const FormContext = createContext<FormContextType>({
   handleInputChange: () => { },
   addFields: () => { },
   deleteAField: () => { },
+  fieldsByFormKey: () => { },
 });
 
 const { Provider } = FormContext;
@@ -63,7 +66,19 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     setFields(newFields)
   }
 
-  return <Provider value={{ fields, handleInputChange, addFields, deleteAField }}>
+  const fieldsByFormKey = (formKey: string) => {
+    const returnValues: { value: string | number | undefined; foreignKeys: object | undefined; }[] = []
+    Object.values(fields).forEach(f => {
+      if (f.formKey !== formKey) {
+        return
+      }
+      const { value, foreignKeys } = f
+      returnValues.push({ value, foreignKeys })
+    })
+    return returnValues
+  }
+
+  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey }}>
     {children}
   </Provider>
 }
