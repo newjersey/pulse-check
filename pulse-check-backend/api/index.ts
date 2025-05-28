@@ -67,32 +67,51 @@ app.get('/api/:record_type', async c => {
 
 app.post('/api/update', async (c) => {
   const data = await c.req.json();
-  const response = await base(tableNames.updates).create({
+
+  if (!data.updates?.updateDetails || !data.updates?.projectStatus || !data?.updates.projectId) {
+    c.status(400)
+    return c.text('Bad request')
+  }
+
+  const updateResponse = await base(tableNames.updates).create({
     "Description": data.updates.updateDetails,
     "Status": data.updates.projectStatus,
     "Project": [
       data.updates.projectId
     ],
   })
-  const projectReponse = await base(tableNames.projects).update([{
-    id: data.updates.projectId,
-    fields: {
-      Phase: data.updates.phase,
-      'Anticipated phase change': data.updates.phaseChangeDate
-    }
-  }])
-  const metricUpdates = data.updates.metricUpdates.map(
-    (m: { foreignKeys: { [x: string]: any; Project: any }; value: any }) => ({
+  let returnData: { update: any, project?: any, metricUpdates?: any } = { update: updateResponse.fields }
+  
+  let projectReponse;
+  if (data.updates.phase || data.updates.phaseChangeDate) {
+    projectReponse = await base(tableNames.projects).update([{
+      id: data.updates.projectId,
       fields: {
-        Project: [data.updates.projectId],
-        Value: m.value,
-        "Metric type": [m.foreignKeys?.['Metric type']]
+        Phase: data.updates.phase,
+        'Anticipated phase change': data.updates.phaseChangeDate
       }
-    })
-  )
-  const metricUpdatesResponse = await base(tableNames.metrics_updates).create(metricUpdates)
+    }])
+    returnData = {...returnData, project: projectReponse.fields}
+  }
+
+  let metricUpdatesResponse;
+  if (data.updates.metricUpdates) {
+    const metricUpdates = data.updates.metricUpdates.map(
+      (m: { foreignKeys: { [x: string]: any; Project: any }; value: any }) => ({
+        fields: {
+          Project: [data.updates.projectId],
+          Value: m.value,
+          "Metric type": [m.foreignKeys?.['Metric type']]
+        }
+      })
+    )
+    metricUpdatesResponse = await base(tableNames.metricsUpdates).create(metricUpdates)
+    returnData = {...returnData, metricUpdates: metricUpdatesResponse.fields}
+  }
+  
   c.status(200)
-  return c.json({ ...response.fields, ...projectReponse.fields, ...metricUpdatesResponse.fields })
+  console.log({ returnData })
+  return c.json(returnData)
 })
 
 serve({ fetch: app.fetch, port: 3001 })

@@ -130,36 +130,42 @@ export type RecordByIdType<T> = {
   [key: string]: T
 }
 
-export type DataContextType = {
+export type DataType = {
+  projects?: RecordByIdType<Project>;
+  people?: RecordByIdType<Person>;
+  updates?: RecordByIdType<ProjectUpdate>;
+  deliverables?: RecordByIdType<Deliverable>;
+  technologies?: RecordByIdType<Technology>;
+  organizations?: RecordByIdType<Organization>;
+  metricsUpdates?: RecordByIdType<MetricUpdate>;
+  metricTypes?: RecordByIdType<MetricType>;
+  needsTypes?: RecordByIdType<NeedType>;
+  needs?: RecordByIdType<Need>;
+}
+
+export type DataContextType = DataType & {
   authToken: string | null;
   setAuthToken: Function;
   loading: Boolean;
   loadingResponse: Boolean;
-  projects: RecordByIdType<Project> | undefined;
-  people: RecordByIdType<Person> | undefined;
-  updates: RecordByIdType<ProjectUpdate> | undefined;
-  deliverables: RecordByIdType<Deliverable> | undefined;
-  technologies: RecordByIdType<Technology> | undefined;
-  organizations: RecordByIdType<Organization> | undefined;
-  metricsUpdates: RecordByIdType<MetricUpdate> | undefined;
-  metricTypes: RecordByIdType<MetricType> | undefined;
-  needsTypes: RecordByIdType<NeedType> | undefined;
-  needs: RecordByIdType<Need> | undefined;
   postData: (endpoint: string, data: any) => any;
+  fetchData: (endpoint: TableNameKeys[number][]) => void;
 }
-
-// const tableNames = {
-//   projects: 'Projects',
-//   people: 'People',
-//   updates: 'Project updates',
-//   deliverables: 'Deliverables',
-//   technologies: 'Technologies',
-//   organizations: 'Organizations',
-//   metrics_updates: 'Metrics updates',
-//   metric_types: 'Metric types',
-//   needs_types: 'Project needs types',
-//   needs: 'Current project needs'
-// }
+export type TableNameKeys = keyof DataType;
+export const tableNames: {
+  [key: TableNameKeys[number]]: string
+} = {
+  projects: 'Projects',
+  people: 'People',
+  updates: 'Project updates',
+  deliverables: 'Deliverables',
+  technologies: 'Technologies',
+  organizations: 'Organizations',
+  metricsUpdates: 'Metrics updates',
+  metricTypes: 'Metric types',
+  needsTypes: 'Project needs types',
+  needs: 'Current project needs'
+}
 
 export type ProjectEditForm = {
   projectId: string;

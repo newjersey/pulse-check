@@ -35,7 +35,7 @@ export default function () {
     {fields && fields.map(field => (
       <React.Fragment key={field.id}>
         <label className="usa-label" htmlFor={field.id}>{field.label}</label>
-        <input className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} type="number" />
+        <input className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} type="number" pattern="[0-9]" />
       </React.Fragment>
     ))}
   </>

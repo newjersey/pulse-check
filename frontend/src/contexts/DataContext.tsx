@@ -1,22 +1,13 @@
-import { createContext, ReactNode, SetStateAction, useContext, useEffect, useState } from 'react'
-import { DataContextType, RecordByIdType, Project, Person, Deliverable, Technology, Organization, MetricUpdate, MetricType, NeedType, Need, ProjectUpdate } from '../utils/types';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { DataContextType, TableNameKeys, tableNames, DataType } from '../utils/types';
 
 const DataContext = createContext<DataContextType>({
   authToken: null,
   setAuthToken: () => {},
   loading: false,
   loadingResponse: false,
-  projects: undefined,
-  people: undefined,
-  updates: undefined,
-  deliverables: undefined,
-  technologies: undefined,
-  organizations: undefined,
-  metricsUpdates: undefined,
-  metricTypes: undefined,
-  needsTypes: undefined,
-  needs: undefined,
-  postData: () => {}
+  postData: () => {},
+  fetchData: () => {}
 });
 
 const { Provider } = DataContext;
@@ -29,57 +20,40 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
-  const [refreshData, setRefreshData] = useState(false)
   function setAuthToken(input: string) {
     _setAuthToken(input)
     sessionStorage.setItem("nj-ooi-pulse-check", input);
   }
 
-  const [projects, setProjects] = useState<RecordByIdType<Project>>()
-  const [people, setPeople] = useState<RecordByIdType<Person>>()
-  const [updates, setUpdates] = useState<RecordByIdType<ProjectUpdate>>()
-  const [deliverables, setDeliverables] = useState<RecordByIdType<Deliverable>>()
-  const [technologies, setTechnologies] = useState<RecordByIdType<Technology>>()
-  const [organizations, setOrganizations] = useState<RecordByIdType<Organization>>()
-  const [metricsUpdates, setMetricsUpdates] = useState<RecordByIdType<MetricUpdate>>()
-  const [metricTypes, setMetricTypes] = useState<RecordByIdType<MetricType>>()
-  const [needsTypes, setNeedsTypes] = useState<RecordByIdType<NeedType>>()
-  const [needs, setNeeds] = useState<RecordByIdType<Need>>()
+  const [data, setData] = useState<DataType>({})
 
-  const fetchData = async (endpoint: string, setData: SetStateAction<any>) => {
+  const fetchData = async (_tableNames: TableNameKeys[number][]) => {
     setLoading(true);
     try {
-      const response = await fetch(
-        `${apiURL}/api/${endpoint}`,
-        { headers: { Authorization: 'Basic ' + authToken } }
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      const result = await response.json();
-      setData(result.data);
+      await Promise.all(_tableNames.map(async tableName => {
+        const response = await fetch(
+          `${apiURL}/api/${tableName}`,
+          { headers: { Authorization: 'Basic ' + authToken } }
+        );
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const result = await response.json();
+        setData(priorData => ({...priorData, [tableName]: result.data }));
+      }))
     } catch (error) {
       console.error(error);
     } finally {
-      setRefreshData(false);
       setLoading(false);
     }
+
   };
-  
+
   useEffect(() => {
     if (authToken) {
-      fetchData('projects', setProjects);
-      fetchData('people', setPeople);
-      fetchData('updates', setUpdates);
-      fetchData('deliverables', setDeliverables);
-      fetchData('technologies', setTechnologies);
-      fetchData('organizations', setOrganizations);
-      fetchData('metrics_updates', setMetricsUpdates);
-      fetchData('metric_types', setMetricTypes);
-      fetchData('needs_types', setNeedsTypes);
-      fetchData('needs', setNeeds);
+      fetchData(Object.keys(tableNames))
     }
-  }, [authToken, refreshData])
+  }, [authToken])
 
   async function postData(endpoint: string, data: any) {
     setLoadingResponse(true)
@@ -104,7 +78,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, projects, people, updates, deliverables, technologies, organizations, metricsUpdates, metricTypes, needsTypes, needs, postData }}>
+  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData }}>
     {children}
   </Provider>
 }

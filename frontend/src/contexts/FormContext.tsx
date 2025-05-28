@@ -9,6 +9,7 @@ type Field = {
   id: string;
   formKey: string; // TODO keyof ProjectAddForm | ProjectEditForm | UpdateForm;
   foreignKeys?: object;
+  isValid?: boolean;
 }
 
 export type Fields = {
@@ -21,6 +22,7 @@ type FormContextType = {
   addFields: (fields: Field[]) => void;
   deleteAField: Function;
   fieldsByFormKey: Function;
+  isFormInvalid: Function;
 }
 
 const FormContext = createContext<FormContextType>({
@@ -29,6 +31,7 @@ const FormContext = createContext<FormContextType>({
   addFields: () => { },
   deleteAField: () => { },
   fieldsByFormKey: () => { },
+  isFormInvalid: () => { }
 });
 
 const { Provider } = FormContext;
@@ -41,11 +44,13 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     const field = fields[id]
+    const isValid = !field.required || (field.required && !!value)
     setFields(_fields => ({
       ...fields,
       [id]: {
         ...field,
-        value
+        value,
+        isValid,
       },
     }));
   };
@@ -54,7 +59,10 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     setFields(_fields => {
       const newFields = { ..._fields }
       fieldsToAdd.forEach(newField => {
-        newFields[newField.id] = newField
+        newFields[newField.id] = {
+          ...newField,
+          isValid: !newField.required || (newField.required && !!newField.value)
+        }
       })
       return newFields
     })
@@ -78,7 +86,11 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     return returnValues
   }
 
-  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey }}>
+  const isFormInvalid = () => {
+    return Object.values(fields).some(f => f.isValid === false)
+  }
+
+  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid }}>
     {children}
   </Provider>
 }

@@ -9,9 +9,9 @@ export const tableNames = {
   deliverables: 'Deliverables',
   technologies: 'Technologies',
   organizations: 'Organizations',
-  metrics_updates: 'Metrics updates',
-  metric_types: 'Metric types',
-  needs_types: 'Project needs types',
+  metricsUpdates: 'Metrics updates',
+  metricTypes: 'Metric types',
+  needsTypes: 'Project needs types',
   needs: 'Current project needs'
 }
 

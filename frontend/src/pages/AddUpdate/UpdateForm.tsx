@@ -4,18 +4,22 @@ import { MetricUpdates, PhaseChangeDate, ProjectField, ProjectPhase, UpdateDescr
 import useProject from "../../utils/useProject";
 import React, { useState } from "react";
 
-
 export default function () {
-  const { loadingResponse, postData } = useDataContext();
-  const { fields, fieldsByFormKey } = useFormContext();
+  const { loadingResponse, postData, fetchData } = useDataContext();
+  const { fields, fieldsByFormKey, isFormInvalid } = useFormContext();
   const { projectId } = useProject();
   const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
 
   async function onSubmit(e: any) {
+    setError(undefined);
     e.preventDefault();
     try {
-      const data = {
+      if (isFormInvalid()) {
+        setError('Some fields are missing');
+        return
+      }
+      const dataToPost = {
         updates: {
           projectId: fields.project.value,
           updateDetails: fields.updateDetails.value,
@@ -27,18 +31,17 @@ export default function () {
         // projectNeeds: {}[]String,
         // deliverables: {}[]String,
       }
-      const response = await postData('update', data)
-      const newUpdate = await response.json();
+      const response = await postData('update', dataToPost)
+      await response.json();
       if (response.status === 200) {
-        // TODO ADD UPDATE TO UPDATES
-        console.log(newUpdate)
         setSuccess(true)
+        fetchData(['projects', 'updates', 'deliverables', 'needs', 'metrics_updates'])
         return
       }
       throw new Error("Response was not ok")
     } catch (e) {
       console.log(e)
-      setError("Could not update project :(")
+      setError("Could not update project")
     }
   }
 
@@ -50,9 +53,9 @@ export default function () {
     return <>Yay you did it!</>
   }
 
-  return <form onSubmit={(e) => {e.preventDefault()}}>
+  return <form onSubmit={(e) => { e.preventDefault() }}>
     {/* TODO: ACTUAL ALERT COMPONENT */}
-    {error && <p>Oh no, an error!</p>}
+    {<h1>Error: {error}</h1>}
     <ProjectField />
     {projectId && <React.Fragment key={projectId}>
       <UpdateDescription />
