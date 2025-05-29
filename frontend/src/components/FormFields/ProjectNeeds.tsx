@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from "react";
-import { useFormContext } from "../../contexts/FormContext"
+import { Field, useFormContext } from "../../contexts/FormContext"
 import { useDataContext } from "../../contexts/DataContext";
 import useProject from "../../utils/useProject";
 import { hydrateIdList } from "../../utils/projectUtils";
@@ -17,7 +17,7 @@ export default function () {
 
     const _needs = hydrateIdList(project["Current project needs"], needs);
 
-    const initialFields = _needs.map(n => (
+    const initialFields: Field[] = _needs.map(n => (
       {
         name: `${n.id}-desc`,
         value: n.Description,
@@ -25,16 +25,18 @@ export default function () {
         required: true,
         id: `${n.id}-desc`,
         formKey: "projectNeeds",
-        foreignKeys: {
+        action: 'update',
+        airtableIds: {
+          id: n.id,
           'Need type': needsTypes[n["Project need type"][0]].id
-        }
+        },
       }
     ))
     addFields(initialFields)
   }, [loading, project, needs, needsTypes])
 
   const displayFields = useMemo(() => {
-    return Object.values(fields).filter(f => f.formKey === 'projectNeeds')
+    return Object.values(fields).filter(f => f.formKey === 'projectNeeds' && f.action !== 'delete')
   }, [fields])
 
   function handleDeleteClick(fieldId: string) {
@@ -51,9 +53,10 @@ export default function () {
       required: true,
       id: `${displayFields.length}-desc`,
       formKey: "projectNeeds",
-      foreignKeys: {
+      action: 'create',
+      airtableIds: {
         'Need type': undefined
-      }
+      },
     }])
   }
 
@@ -65,7 +68,7 @@ export default function () {
         <div className="grid-row grid-gap">
           <div className="grid-col-4">
             <label className="usa-label" htmlFor={`${field.id}-type`}>Need type</label>
-            <select className="usa-select" name={`${field.id}-type`} id={`${field.id}-type`} required onChange={getForeignKeyHandler(field, 'Need type')} defaultValue={field.foreignKeys?.['Need type'] || undefined}>
+            <select className="usa-select" name={`${field.id}-type`} id={`${field.id}-type`} required onChange={getForeignKeyHandler(field, 'Need type')} defaultValue={field.airtableIds?.['Need type'] || undefined}>
               <option value={undefined}>- Choose a project -</option>
               {needsTypes && Object.keys(needsTypes).map(key => (
                 <option value={key} key={key}>{needsTypes[key]?.Type}</option>

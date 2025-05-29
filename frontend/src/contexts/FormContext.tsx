@@ -1,14 +1,15 @@
 import { ChangeEvent, createContext, ReactNode, useContext, useState } from 'react'
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
-type Field = {
+export type Field = {
   name: string;
   value: string | number | undefined;
   label: string;
   required: boolean | undefined;
   id: string;
   formKey: string; // TODO keyof ProjectAddForm | ProjectEditForm | UpdateForm;
-  foreignKeys?: { [key: string]: any }; // TODO better typing here too
+  action?: 'create' | 'update' | 'delete';
+  airtableIds?: { [key: string]: any }; // TODO better typing here too
   isValid?: boolean;
 }
 
@@ -33,7 +34,7 @@ const FormContext = createContext<FormContextType>({
   deleteAField: () => { },
   fieldsByFormKey: () => { },
   isFormInvalid: () => { },
-  getForeignKeyHandler: () => {},
+  getForeignKeyHandler: () => { },
 });
 
 const { Provider } = FormContext;
@@ -64,8 +65,8 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
         ...fields,
         [field.id]: {
           ...field,
-          foreignKeys: {
-            ...field.foreignKeys,
+          airtableIds: {
+            ...field.airtableIds,
             [foreignKey]: value
           }
         },
@@ -87,19 +88,26 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteAField = (id: keyof Fields) => {
-    const newFields = Object.assign({}, fields)
-    delete newFields[id]
-    setFields(newFields)
+    setFields(_fields => {
+      const newFields = { ..._fields }
+      const field = fields[id]
+      newFields[id] = {
+        ...field,
+        isValid: true,
+        action: 'delete'
+      }
+      return newFields
+    })
   }
 
   const fieldsByFormKey = (formKey: string) => {
-    const returnValues: { value: string | number | undefined; foreignKeys: object | undefined; }[] = []
+    const returnValues: { value: string | number | undefined; airtableIds: object | undefined; action: string | undefined }[] = []
     Object.values(fields).forEach(f => {
       if (f.formKey !== formKey) {
         return
       }
-      const { value, foreignKeys } = f
-      returnValues.push({ value, foreignKeys })
+      const { value, airtableIds, action } = f
+      returnValues.push({ value, airtableIds, action })
     })
     return returnValues
   }

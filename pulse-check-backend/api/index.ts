@@ -73,45 +73,70 @@ app.post('/api/update', async (c) => {
     return c.text('Bad request')
   }
 
-  const updateResponse = await base(tableNames.updates).create({
+  await base(tableNames.updates).create({
     "Description": data.updates.updateDetails,
     "Status": data.updates.projectStatus,
     "Project": [
       data.updates.projectId
     ],
   })
-  let returnData: { update: any, project?: any, metricUpdates?: any } = { update: updateResponse.fields }
   
-  let projectReponse;
   if (data.updates.phase || data.updates.phaseChangeDate) {
-    projectReponse = await base(tableNames.projects).update([{
+    await base(tableNames.projects).update([{
       id: data.updates.projectId,
       fields: {
         Phase: data.updates.phase,
         'Anticipated phase change': data.updates.phaseChangeDate
       }
     }])
-    returnData = {...returnData, project: projectReponse.fields}
   }
 
-  let metricUpdatesResponse;
   if (data.updates.metricUpdates) {
     const metricUpdates = data.updates.metricUpdates.map(
-      (m: { foreignKeys: { [x: string]: any; Project: any }; value: any }) => ({
+      (m: { airtableIds: { [x: string]: any; Project: any }; value: any }) => ({
         fields: {
           Project: [data.updates.projectId],
           Value: m.value,
-          "Metric type": [m.foreignKeys?.['Metric type']]
+          "Metric type": [m.airtableIds?.['Metric type']]
         }
       })
     )
-    metricUpdatesResponse = await base(tableNames.metricsUpdates).create(metricUpdates)
-    returnData = {...returnData, metricUpdates: metricUpdatesResponse.fields}
+    await base(tableNames.metricsUpdates).create(metricUpdates)
   }
-  
+
+  type Need = { action: string | number; airtableIds: { [x: string]: any; id: string | undefined }; value: any }
+  if (data.updates.projectNeeds) {
+    const createNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
+      fields: {
+        Project: [data.updates.projectId],
+        'Project need type': [n.airtableIds['Need type']],
+        Description: n.value
+      }
+    } : [])
+    if (createNeeds.length) {
+      await base(tableNames.needs).create(createNeeds)
+    }
+
+    const updateNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
+      id: n.airtableIds.id,
+      fields: {
+        Project: [data.updates.projectId],
+        'Project need type': [n.airtableIds['Need type']],
+        Description: n.value
+      }
+    } : [])
+    if (updateNeeds.length) {
+      await base(tableNames.needs).update(updateNeeds)
+    }
+
+    const deleteNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'delete' ? n.airtableIds.id : [])
+    if (deleteNeeds.length) {
+      await base(tableNames.needs).destroy(deleteNeeds)
+    }
+  }
+
   c.status(200)
-  console.log({ returnData })
-  return c.json(returnData)
+  return c.text('Ok')
 })
 
 serve({ fetch: app.fetch, port: 3001 })

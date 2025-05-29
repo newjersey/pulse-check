@@ -20,7 +20,7 @@ export default function () {
       required: true,
       id: `${m.id}-metric`,
       formKey: 'metricUpdates',
-      foreignKeys: {
+      airtableIds: {
         'Metric type': m.id
       }
     }))
