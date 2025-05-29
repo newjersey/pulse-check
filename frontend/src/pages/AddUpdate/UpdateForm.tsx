@@ -5,7 +5,7 @@ import useProject from "../../utils/useProject";
 import React, { useState } from "react";
 
 export default function () {
-  const { loadingResponse, postData, fetchData } = useDataContext();
+  const { loadingResponse, postData, setReloadTablesAfterNavigate } = useDataContext();
   const { fields, fieldsByFormKey, isFormInvalid } = useFormContext();
   const { projectId } = useProject();
   const [error, setError] = useState<string>();
@@ -35,7 +35,7 @@ export default function () {
       await response.json();
       if (response.status === 200) {
         setSuccess(true)
-        fetchData(['projects', 'updates', 'deliverables', 'needs', 'metrics_updates'])
+        setReloadTablesAfterNavigate(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
         return
       }
       throw new Error("Response was not ok")
@@ -55,7 +55,7 @@ export default function () {
 
   return <form onSubmit={(e) => { e.preventDefault() }}>
     {/* TODO: ACTUAL ALERT COMPONENT */}
-    {<h1>Error: {error}</h1>}
+    {error && <h1>Error: {error}</h1>}
     <ProjectField />
     {projectId && <React.Fragment key={projectId}>
       <UpdateDescription />

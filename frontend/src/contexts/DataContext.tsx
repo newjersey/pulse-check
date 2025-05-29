@@ -1,5 +1,6 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
 import { DataContextType, TableNameKeys, tableNames, DataType } from '../utils/types';
+import { useLocation } from 'react-router';
 
 const DataContext = createContext<DataContextType>({
   authToken: null,
@@ -7,7 +8,8 @@ const DataContext = createContext<DataContextType>({
   loading: false,
   loadingResponse: false,
   postData: () => {},
-  fetchData: () => {}
+  fetchData: () => {},
+  setReloadTablesAfterNavigate: () => {}
 });
 
 const { Provider } = DataContext;
@@ -20,14 +22,16 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
-  function setAuthToken(input: string) {
+  const [reloadTablesAfterNavigate, setReloadTablesAfterNavigate] = useState<TableNameKeys[number][] | undefined>()
+  const [data, setData] = useState<DataType>({})
+  const { pathname } = useLocation();
+
+  function setAuthToken (input: string) {
     _setAuthToken(input)
     sessionStorage.setItem("nj-ooi-pulse-check", input);
   }
 
-  const [data, setData] = useState<DataType>({})
-
-  const fetchData = async (_tableNames: TableNameKeys[number][]) => {
+  async function fetchData (_tableNames: TableNameKeys[number][]) {
     setLoading(true);
     try {
       await Promise.all(_tableNames.map(async tableName => {
@@ -49,12 +53,6 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
 
   };
 
-  useEffect(() => {
-    if (authToken) {
-      fetchData(Object.keys(tableNames))
-    }
-  }, [authToken])
-
   async function postData(endpoint: string, data: any) {
     setLoadingResponse(true)
     try {
@@ -69,7 +67,6 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-      // setRefreshData(true); TODO FIGURE THIS OUT
       return response
     } catch (error) {
       console.error(error);
@@ -77,8 +74,20 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       setLoadingResponse(false);
     }
   }
+  
+  useEffect(() => {
+    if (authToken) {
+      fetchData(Object.keys(tableNames))
+    }
+  }, [authToken])
 
-  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData }}>
+  useEffect(() => {
+    if (reloadTablesAfterNavigate?.length) {
+      fetchData(reloadTablesAfterNavigate)
+    }
+  }, [pathname])
+
+  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData, setReloadTablesAfterNavigate }}>
     {children}
   </Provider>
 }

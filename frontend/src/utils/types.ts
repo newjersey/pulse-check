@@ -150,7 +150,9 @@ export type DataContextType = DataType & {
   loadingResponse: Boolean;
   postData: (endpoint: string, data: any) => any;
   fetchData: (endpoint: TableNameKeys[number][]) => void;
+  setReloadTablesAfterNavigate: Function;
 }
+
 export type TableNameKeys = keyof DataType;
 export const tableNames: {
   [key: TableNameKeys[number]]: string
