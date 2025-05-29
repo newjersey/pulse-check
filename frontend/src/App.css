@@ -3,6 +3,10 @@
   padding: 2rem;
 }
 
+main, main:focus {
+  outline: none !important;
+}
+
 div[role=tablist] {
   border-bottom: 1px solid lightgray;
 }

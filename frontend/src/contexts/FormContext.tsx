@@ -8,7 +8,7 @@ type Field = {
   required: boolean | undefined;
   id: string;
   formKey: string; // TODO keyof ProjectAddForm | ProjectEditForm | UpdateForm;
-  foreignKeys?: object;
+  foreignKeys?: { [key: string]: any }; // TODO better typing here too
   isValid?: boolean;
 }
 
@@ -23,6 +23,7 @@ type FormContextType = {
   deleteAField: Function;
   fieldsByFormKey: Function;
   isFormInvalid: Function;
+  getForeignKeyHandler: Function;
 }
 
 const FormContext = createContext<FormContextType>({
@@ -31,7 +32,8 @@ const FormContext = createContext<FormContextType>({
   addFields: () => { },
   deleteAField: () => { },
   fieldsByFormKey: () => { },
-  isFormInvalid: () => { }
+  isFormInvalid: () => { },
+  getForeignKeyHandler: () => {},
 });
 
 const { Provider } = FormContext;
@@ -54,6 +56,22 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
       },
     }));
   };
+
+  const getForeignKeyHandler = (field: Field, foreignKey: string) => {
+    return (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+      const { value } = e.target;
+      setFields(_fields => ({
+        ...fields,
+        [field.id]: {
+          ...field,
+          foreignKeys: {
+            ...field.foreignKeys,
+            [foreignKey]: value
+          }
+        },
+      }));
+    }
+  }
 
   const addFields = (fieldsToAdd: Field[]) => {
     setFields(_fields => {
@@ -90,7 +108,7 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     return Object.values(fields).some(f => f.isValid === false)
   }
 
-  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid }}>
+  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid, getForeignKeyHandler }}>
     {children}
   </Provider>
 }

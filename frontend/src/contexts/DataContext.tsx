@@ -1,6 +1,16 @@
 import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
-import { DataContextType, TableNameKeys, tableNames, DataType } from '../utils/types';
+import { DataType, TableNameKeys, tableNames } from '../utils/types';
 import { useLocation } from 'react-router';
+
+export type DataContextType = DataType & {
+  authToken: string | null;
+  setAuthToken: Function;
+  loading: Boolean;
+  loadingResponse: Boolean;
+  postData: (endpoint: string, data: any) => any;
+  fetchData: (endpoint: TableNameKeys[number][]) => void;
+  setReloadTablesAfterNavigate: Function;
+}
 
 const DataContext = createContext<DataContextType>({
   authToken: null,

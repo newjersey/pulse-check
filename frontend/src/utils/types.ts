@@ -143,16 +143,6 @@ export type DataType = {
   needs?: RecordByIdType<Need>;
 }
 
-export type DataContextType = DataType & {
-  authToken: string | null;
-  setAuthToken: Function;
-  loading: Boolean;
-  loadingResponse: Boolean;
-  postData: (endpoint: string, data: any) => any;
-  fetchData: (endpoint: TableNameKeys[number][]) => void;
-  setReloadTablesAfterNavigate: Function;
-}
-
 export type TableNameKeys = keyof DataType;
 export const tableNames: {
   [key: TableNameKeys[number]]: string
@@ -169,44 +159,44 @@ export const tableNames: {
   needs: 'Current project needs'
 }
 
-export type ProjectEditForm = {
-  projectId: string;
-  projectName?: string;
-  projectDesc?: string;
-  initiative?: Initiative[number];
-  team?: string[];
-  partners?: string[];
-  technologies?: string[];
-  metricTypes?: string[];
-  roadmapLink?: string;
-  phase?: ProjectPhase[number];
-  phaseChangeDate?: string;
-  deliverables?: {
-    [id: string]: Deliverable
-  };
-}
+// export type ProjectEditForm = {
+//   projectId: string;
+//   projectName?: string;
+//   projectDesc?: string;
+//   initiative?: Initiative[number];
+//   team?: string[];
+//   partners?: string[];
+//   technologies?: string[];
+//   metricTypes?: string[];
+//   roadmapLink?: string;
+//   phase?: ProjectPhase[number];
+//   phaseChangeDate?: string;
+//   deliverables?: {
+//     [id: string]: Deliverable
+//   };
+// }
 
-export type ProjectAddForm = {
-  projectName: string;
-  projectDesc: string;
-  initiative: Initiative[number];
-  team: string[];
-  partners: string[];
-  technologies: string[];
-  metricTypes: string[];
-  roadmapLink: string;
-  phase: ProjectPhase[number];
-  phaseChangeDate: string;
-  deliverables?: {}[];
-}
+// export type ProjectAddForm = {
+//   projectName: string;
+//   projectDesc: string;
+//   initiative: Initiative[number];
+//   team: string[];
+//   partners: string[];
+//   technologies: string[];
+//   metricTypes: string[];
+//   roadmapLink: string;
+//   phase: ProjectPhase[number];
+//   phaseChangeDate: string;
+//   deliverables?: {}[];
+// }
 
-export type UpdateForm = {
-  projectId: string;
-  updateDetails: string;
-  projectStatus: StatusValues[number];
-  metricUpdates: {}[];
-  projectNeeds: {}[];
-  phase: ProjectPhase[number];
-  phaseChangeDate: string;
-  deliverables: {}[];
-}
+// export type UpdateForm = {
+//   projectId: string;
+//   updateDetails: string;
+//   projectStatus: StatusValues[number];
+//   metricUpdates: {}[];
+//   projectNeeds: {}[];
+//   phase: ProjectPhase[number];
+//   phaseChangeDate: string;
+//   deliverables: {}[];
+// }
