@@ -65,6 +65,8 @@ app.get('/api/:record_type', async c => {
   return c.json({ data, status: 200 })
 })
 
+type Need = { action: string | number; airtableIds: { [x: string]: any; id: string | undefined }; value: any }
+
 app.post('/api/update', async (c) => {
   const data = await c.req.json();
 
@@ -91,7 +93,7 @@ app.post('/api/update', async (c) => {
     }])
   }
 
-  if (data.updates.metricUpdates) {
+  if (data.updates.metricUpdates?.length) {
     const metricUpdates = data.updates.metricUpdates.map(
       (m: { airtableIds: { [x: string]: any; Project: any }; value: any }) => ({
         fields: {
@@ -103,9 +105,8 @@ app.post('/api/update', async (c) => {
     )
     await base(tableNames.metricsUpdates).create(metricUpdates)
   }
-
-  type Need = { action: string | number; airtableIds: { [x: string]: any; id: string | undefined }; value: any }
-  if (data.updates.projectNeeds) {
+    
+  if (data.updates.projectNeeds?.length) {
     const createNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
       fields: {
         Project: [data.updates.projectId],
@@ -113,11 +114,12 @@ app.post('/api/update', async (c) => {
         Description: n.value
       }
     } : [])
+    
     if (createNeeds.length) {
       await base(tableNames.needs).create(createNeeds)
     }
-
-    const updateNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
+    
+    const updateNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'update' ? {
       id: n.airtableIds.id,
       fields: {
         Project: [data.updates.projectId],
@@ -129,14 +131,14 @@ app.post('/api/update', async (c) => {
       await base(tableNames.needs).update(updateNeeds)
     }
 
-    const deleteNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'delete' ? n.airtableIds.id : [])
+    const deleteNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'delete' ? [n.airtableIds.id] : [])
     if (deleteNeeds.length) {
       await base(tableNames.needs).destroy(deleteNeeds)
     }
   }
 
   c.status(200)
-  return c.text('Ok')
+  return c.json({ status: 200 })
 })
 
 serve({ fetch: app.fetch, port: 3001 })
