@@ -60,7 +60,6 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoading(false);
     }
-
   };
 
   async function postData(endpoint: string, data: any) {

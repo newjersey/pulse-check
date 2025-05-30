@@ -82,7 +82,7 @@ app.post('/api/update', async (c) => {
       data.updates.projectId
     ],
   })
-  
+
   if (data.updates.phase || data.updates.phaseChangeDate) {
     await base(tableNames.projects).update([{
       id: data.updates.projectId,
@@ -105,35 +105,39 @@ app.post('/api/update', async (c) => {
     )
     await base(tableNames.metricsUpdates).create(metricUpdates)
   }
-    
+  
   if (data.updates.projectNeeds?.length) {
-    const createNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
-      fields: {
-        Project: [data.updates.projectId],
-        'Project need type': [n.airtableIds['Need type']],
-        Description: n.value
-      }
-    } : [])
-    
-    if (createNeeds.length) {
-      await base(tableNames.needs).create(createNeeds)
-    }
-    
-    const updateNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'update' ? {
-      id: n.airtableIds.id,
-      fields: {
-        Project: [data.updates.projectId],
-        'Project need type': [n.airtableIds['Need type']],
-        Description: n.value
-      }
-    } : [])
-    if (updateNeeds.length) {
-      await base(tableNames.needs).update(updateNeeds)
-    }
+    try {
+      const createNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'create' ? {
+        fields: {
+          Project: [data.updates.projectId],
+          'Project need type': [n.airtableIds['Need type']],
+          Description: n.value
+        }
+      } : [])
 
-    const deleteNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'delete' ? [n.airtableIds.id] : [])
-    if (deleteNeeds.length) {
-      await base(tableNames.needs).destroy(deleteNeeds)
+      if (createNeeds.length) {
+        await base(tableNames.needs).create(createNeeds)
+      }
+
+      const updateNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'update' ? {
+        id: n.airtableIds.id,
+        fields: {
+          Project: [data.updates.projectId],
+          'Project need type': [n.airtableIds['Need type']],
+          Description: n.value
+        }
+      } : [])
+      if (updateNeeds.length) {
+        await base(tableNames.needs).update(updateNeeds)
+      }
+
+      const deleteNeeds = data.updates.projectNeeds.flatMap((n: Need) => n.action === 'delete' ? [n.airtableIds.id] : [])
+      if (deleteNeeds.length) {
+        await base(tableNames.needs).destroy(deleteNeeds)
+      }
+    } catch (e) {
+      console.log(e)
     }
   }
 
