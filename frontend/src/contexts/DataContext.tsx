@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useState } from 'react'
+import { createContext, ReactNode, useContext, useEffect, useReducer, useState } from 'react'
 import { DataType, TableNameKeys, tableNames } from '../utils/types';
 import { useLocation } from 'react-router';
 
@@ -14,12 +14,12 @@ export type DataContextType = DataType & {
 
 const DataContext = createContext<DataContextType>({
   authToken: null,
-  setAuthToken: () => {},
+  setAuthToken: () => { },
   loading: false,
   loadingResponse: false,
-  postData: () => {},
-  fetchData: () => {},
-  setReloadTablesAfterNavigate: () => {}
+  postData: () => { },
+  fetchData: () => { },
+  setReloadTablesAfterNavigate: () => { }
 });
 
 const { Provider } = DataContext;
@@ -33,15 +33,19 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
   const [reloadTablesAfterNavigate, setReloadTablesAfterNavigate] = useState<TableNameKeys[number][] | undefined>()
-  const [data, setData] = useState<DataType>({})
+  const [data, dispatchData] = useReducer<DataType, [updatedData: Partial<DataType>]>(dataReducer, {})
   const { pathname } = useLocation();
 
-  function setAuthToken (input: string) {
+  function setAuthToken(input: string) {
     _setAuthToken(input)
     sessionStorage.setItem("nj-ooi-pulse-check", input);
   }
 
-  async function fetchData (_tableNames: TableNameKeys[number][]) {
+  function dataReducer(priorData: DataType, updatedData: Partial<DataType>) {
+    return { ...priorData, ...updatedData}
+  }
+
+  async function fetchData(_tableNames: TableNameKeys[number][]) {
     setLoading(true);
     try {
       await Promise.all(_tableNames.map(async tableName => {
@@ -53,7 +57,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-        setData(priorData => ({...priorData, [tableName]: result.data }));
+        dispatchData({ [tableName]: result.data });
       }))
     } catch (error) {
       console.error(error);
@@ -83,7 +87,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       setLoadingResponse(false);
     }
   }
-  
+
   useEffect(() => {
     if (authToken) {
       fetchData(Object.keys(tableNames))
@@ -93,8 +97,9 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (reloadTablesAfterNavigate?.length) {
       fetchData(reloadTablesAfterNavigate)
+      setReloadTablesAfterNavigate([])
     }
-  }, [pathname])
+  }, [pathname, fetchData])
 
   return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData, setReloadTablesAfterNavigate }}>
     {children}
