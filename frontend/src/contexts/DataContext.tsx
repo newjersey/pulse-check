@@ -99,7 +99,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
       fetchData(reloadTablesAfterNavigate)
       setReloadTablesAfterNavigate([])
     }
-  }, [pathname, fetchData])
+  }, [pathname])
 
   return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData, setReloadTablesAfterNavigate }}>
     {children}
