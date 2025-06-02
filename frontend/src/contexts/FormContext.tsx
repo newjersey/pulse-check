@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, ReactNode, useContext, useState } from 'react'
+import { ChangeEvent, createContext, ReactNode, useContext, useReducer } from 'react'
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
 export type Field = {
@@ -42,27 +42,28 @@ const { Provider } = FormContext;
 export const useFormContext = () => useContext(FormContext)
 
 export function FormContextProvider({ children }: { children: ReactNode }) {
-  const [fields, setFields] = useState<Fields>({});
+  const [fields, dispatchFields] = useReducer<Fields, [newFields: Partial<Fields>]>(fieldsReducer, {});
+  function fieldsReducer (priorFields: Fields, newFields: Partial<Fields>) {
+    return {...priorFields, ...newFields } as Fields
+  }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { id, value } = e.target;
     const field = fields[id]
     const isValid = !field.required || (field.required && !!value)
-    setFields(_fields => ({
-      ...fields,
+    dispatchFields({
       [id]: {
         ...field,
         value,
         isValid,
       },
-    }));
+    })
   };
 
   const getForeignKeyHandler = (field: Field, foreignKey: string) => {
     return (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const { value } = e.target;
-      setFields(_fields => ({
-        ...fields,
+      dispatchFields({
         [field.id]: {
           ...field,
           airtableIds: {
@@ -70,33 +71,29 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
             [foreignKey]: value
           }
         },
-      }));
+      })
     }
   }
 
   const addFields = (fieldsToAdd: Field[]) => {
-    setFields(_fields => {
-      const newFields = { ..._fields }
-      fieldsToAdd.forEach(newField => {
-        newFields[newField.id] = {
-          ...newField,
-          isValid: !newField.required || (newField.required && !!newField.value)
-        }
-      })
-      return newFields
+    const newFields: Fields = {}
+    fieldsToAdd.forEach(newField => {
+      newFields[newField.id] = {
+        ...newField,
+        isValid: !newField.required || (newField.required && !!newField.value)
+      }
     })
+    dispatchFields(newFields)
   }
 
   const deleteAField = (id: keyof Fields) => {
-    setFields(_fields => {
-      const newFields = { ..._fields }
-      const field = fields[id]
-      newFields[id] = {
+    const field = fields[id]
+    dispatchFields({
+      [id]: {
         ...field,
         isValid: true,
         action: 'delete'
-      }
-      return newFields
+      } as Field
     })
   }
 

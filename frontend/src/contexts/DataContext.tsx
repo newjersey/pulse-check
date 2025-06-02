@@ -66,7 +66,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  async function postData(endpoint: string, data: any) {
+  async function postData(endpoint: string, inputData: any) {
     setLoadingResponse(true)
     try {
       const response = await fetch(
@@ -74,7 +74,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
         {
           method: 'POST',
           headers: { Authorization: 'Basic ' + authToken },
-          body: JSON.stringify(data)
+          body: JSON.stringify(inputData)
         }
       );
       if (!response.ok) {

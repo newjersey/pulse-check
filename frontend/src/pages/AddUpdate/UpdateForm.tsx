@@ -32,8 +32,8 @@ export default function () {
         // deliverables: {}[]String,
       }
       const response = await postData('update', dataToPost)
-      await response.json();
-      if (response.status === 200) {
+      console.log(response)
+      if (response.status == 200) {
         setSuccess(true)
         setReloadTablesAfterNavigate(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
         return
