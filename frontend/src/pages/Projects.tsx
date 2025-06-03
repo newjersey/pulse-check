@@ -10,7 +10,18 @@ export default function () {
   const { projects } = useDataContext();
 
   const activeProjectsByInitiative = useMemo(() => {
-    const _activeProjects = projects ? Object.values(projects) : []
+    const _activeProjects = projects ? Object.values(projects).filter(p => p.Phase
+      !== 'Sunset'
+    ) : []
+    _activeProjects.sort((a, b) => {
+      if (a.Name < b.Name) {
+        return -1;
+      }
+      if (a.Name > b.Name) {
+        return 1;
+      }
+      return 0;
+    })
 
     const tabValues: { [key: Initiative[number]]: { projects: Project[] } } = {
       "ResX": {
@@ -46,8 +57,8 @@ export default function () {
           {Object.keys(activeProjectsByInitiative).map(k =>
           (<TabPanel key={k}>
             {activeProjectsByInitiative[k].projects.length === 0 ?
-            <p className='margin-y-4'>{`No projects for ${k} yet`}</p> :
-            <ProjectTable projects={activeProjectsByInitiative[k].projects}/>}
+              <p className='margin-y-4'>{`No projects for ${k} yet`}</p> :
+              <ProjectTable projects={activeProjectsByInitiative[k].projects} />}
           </TabPanel>)
           )}
         </TabPanels>
