@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormContext } from "../../contexts/FormContext"
 import { useDataContext } from "../../contexts/DataContext";
 import useProject from "../../utils/useProject";
@@ -20,20 +20,21 @@ export default function () {
       label: 'Project',
       required: true,
       id: 'project',
-      formKey: 'project'
+      formKey: 'project',
+      replace: true
     }])
   }, [])
 
-  function handleProjectChange(e: ChangeEvent<HTMLSelectElement>) {
-    handleInputChange(e)
-    navigate({ ...location, search: `?projectId=${e.target.value}` }, { replace: true })
-  }
+  useEffect(() => {
+    if (!field?.value) return
+    navigate({ ...location, search: `?projectId=${field.value}` }, { replace: true })
+  }, [field])
 
   if (!field) return <></>
 
   return <>
     <label className="usa-label" htmlFor={field.id}>{field.label}</label>
-    <select className="usa-select" name={field.name} id={field.id} required={field.required} onChange={handleProjectChange} defaultValue={field.value}>
+    <select className="usa-select" name={field.name} id={field.id} required={field.required} onChange={handleInputChange} defaultValue={field.value}>
       <option value="">- Choose a project -</option>
       {projects && Object.keys(projects).map(key => (
         <option value={key} key={key}>{projects[key]?.Name}</option>
