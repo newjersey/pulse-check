@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
+import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import useProject from '../utils/useProject';
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
@@ -27,6 +27,8 @@ type FormContextType = {
   fieldsByFormKey: Function;
   isFormInvalid: Function;
   getForeignKeyHandler: Function;
+  success: boolean;
+  setSuccess: Function;
 }
 
 const FormContext = createContext<FormContextType>({
@@ -37,6 +39,8 @@ const FormContext = createContext<FormContextType>({
   fieldsByFormKey: () => { },
   isFormInvalid: () => { },
   getForeignKeyHandler: () => { },
+  success: false,
+  setSuccess: () => { }
 });
 
 const { Provider } = FormContext;
@@ -52,15 +56,20 @@ export function FormContextProvider({ type, children }: { type: 'create-update' 
   }, [projectId])
 
   let defaultFields = {}
-  if (sessionStorageId && window.sessionStorage?.getItem(sessionStorageId)) {
-    defaultFields = JSON.parse(window.sessionStorage.getItem(sessionStorageId) || "")
+  let defaultSuccess = false
+  const storedData = window.sessionStorage?.getItem(sessionStorageId || '')
+  if (storedData) {
+    const parsed = JSON.parse(storedData)
+    defaultFields = parsed.fields
+    defaultSuccess = parsed.success
   }
   const [fields, dispatchFields] = useReducer<Fields, [{ newFields: Partial<Fields>, replace?: boolean }]>(fieldsReducer, defaultFields);
+  const [success, setSuccess] = useState(defaultSuccess);
 
   useEffect(() => {
     if (!sessionStorageId) return
-    window.sessionStorage.setItem(sessionStorageId, JSON.stringify(fields))
-  }, [fields])
+    window.sessionStorage.setItem(sessionStorageId, JSON.stringify({ fields, success }))
+  }, [fields, success])
 
   function fieldsReducer(priorFields: Fields, { newFields, replace }: { newFields: Partial<Fields>, replace?: boolean }) {
     if (replace) {
@@ -144,7 +153,7 @@ export function FormContextProvider({ type, children }: { type: 'create-update' 
     return Object.values(fields).some(f => f.isValid === false)
   }
 
-  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid, getForeignKeyHandler }}>
+  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid, getForeignKeyHandler, success, setSuccess }}>
     {children}
   </Provider>
 }

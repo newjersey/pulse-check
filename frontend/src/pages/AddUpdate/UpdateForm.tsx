@@ -5,11 +5,10 @@ import useProject from "../../utils/useProject";
 import React, { useState } from "react";
 
 export default function () {
-  const { loadingResponse, postData, setReloadTablesAfterNavigate } = useDataContext();
-  const { fields, fieldsByFormKey, isFormInvalid } = useFormContext();
+  const { loadingResponse, postData, fetchData } = useDataContext();
+  const { fields, fieldsByFormKey, isFormInvalid, success, setSuccess } = useFormContext();
   const { projectId } = useProject();
   const [error, setError] = useState<string>();
-  const [success, setSuccess] = useState(false);
 
   async function onSubmit(e: any) {
     setError(undefined);
@@ -34,7 +33,7 @@ export default function () {
       const response = await postData('update', dataToPost)
       if (response.status == 200) {
         setSuccess(true)
-        setReloadTablesAfterNavigate(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
+        fetchData(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
         return
       }
       throw new Error("Response was not ok")
@@ -43,6 +42,8 @@ export default function () {
       setError("Could not update project")
     }
   }
+
+  console.log(success)
 
   if (loadingResponse || !fields) {
     return <>Loading...</>

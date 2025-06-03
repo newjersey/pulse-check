@@ -1,6 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useReducer, useState } from 'react'
 import { DataType, TableNameKeys, tableNames } from '../utils/types';
-import { useLocation } from 'react-router';
 
 export type DataContextType = DataType & {
   authToken: string | null;
@@ -9,7 +8,6 @@ export type DataContextType = DataType & {
   loadingResponse: Boolean;
   postData: (endpoint: string, data: any) => any;
   fetchData: (endpoint: TableNameKeys[number][]) => void;
-  setReloadTablesAfterNavigate: Function;
 }
 
 const DataContext = createContext<DataContextType>({
@@ -19,7 +17,6 @@ const DataContext = createContext<DataContextType>({
   loadingResponse: false,
   postData: () => { },
   fetchData: () => { },
-  setReloadTablesAfterNavigate: () => { }
 });
 
 const { Provider } = DataContext;
@@ -32,9 +29,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(false);
   const [loadingResponse, setLoadingResponse] = useState(false);
   const [authToken, _setAuthToken] = useState<string | null>(sessionStorage.getItem("nj-ooi-pulse-check"));
-  const [reloadTablesAfterNavigate, setReloadTablesAfterNavigate] = useState<TableNameKeys[number][] | undefined>()
   const [data, dispatchData] = useReducer<DataType, [updatedData: Partial<DataType>]>(dataReducer, {})
-  const { pathname } = useLocation();
 
   function setAuthToken(input: string) {
     _setAuthToken(input)
@@ -94,14 +89,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
     }
   }, [authToken])
 
-  useEffect(() => {
-    if (reloadTablesAfterNavigate?.length) {
-      fetchData(reloadTablesAfterNavigate)
-      setReloadTablesAfterNavigate([])
-    }
-  }, [pathname])
-
-  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData, setReloadTablesAfterNavigate }}>
+  return <Provider value={{ authToken, setAuthToken, loading, loadingResponse, ...data, postData, fetchData }}>
     {children}
   </Provider>
 }
