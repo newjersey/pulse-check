@@ -44,7 +44,7 @@ export default function () {
     }
   }
 
-  if (loadingResponse) {
+  if (loadingResponse || !fields) {
     return <>Loading...</>
   }
 

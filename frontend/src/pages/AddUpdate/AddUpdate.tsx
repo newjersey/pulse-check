@@ -20,7 +20,7 @@ export default function () {
   return (
     <LayoutContainer>
       <PageTemplate title={`Submit an update${project ? ` for ${project.Name}` : ''}`}>
-        <FormContextProvider>
+        <FormContextProvider type="create-update">
           <UpdateForm />
         </FormContextProvider>
       </PageTemplate>

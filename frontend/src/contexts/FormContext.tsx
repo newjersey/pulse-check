@@ -1,4 +1,5 @@
-import { ChangeEvent, createContext, ReactNode, useContext, useReducer } from 'react'
+import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
+import useProject from '../utils/useProject';
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
 export type Field = {
@@ -11,6 +12,7 @@ export type Field = {
   action?: 'create' | 'update' | 'delete';
   airtableIds?: { [key: string]: any }; // TODO better typing here too
   isValid?: boolean;
+  replace?: boolean;
 }
 
 export type Fields = {
@@ -41,10 +43,31 @@ const { Provider } = FormContext;
 
 export const useFormContext = () => useContext(FormContext)
 
-export function FormContextProvider({ children }: { children: ReactNode }) {
-  const [fields, dispatchFields] = useReducer<Fields, [newFields: Partial<Fields>]>(fieldsReducer, {});
-  function fieldsReducer (priorFields: Fields, newFields: Partial<Fields>) {
-    return {...priorFields, ...newFields } as Fields
+export function FormContextProvider({ type, children }: { type: 'create-update' | 'add-project' | 'update-project', children: ReactNode }) {
+  const { projectId } = useProject()
+
+  const sessionStorageId = useMemo(() => {
+    if (!projectId) return
+    return `${projectId}-${type}`
+  }, [projectId])
+
+  let defaultFields = {}
+  if (sessionStorageId && window.sessionStorage?.getItem(sessionStorageId)) {
+    defaultFields = JSON.parse(window.sessionStorage.getItem(sessionStorageId) || "")
+  }
+  const [fields, dispatchFields] = useReducer<Fields, [{ newFields: Partial<Fields>, replace?: boolean }]>(fieldsReducer, defaultFields);
+
+  useEffect(() => {
+    if (!sessionStorageId) return
+    window.sessionStorage.setItem(sessionStorageId, JSON.stringify(fields))
+  }, [fields])
+
+  function fieldsReducer(priorFields: Fields, { newFields, replace }: { newFields: Partial<Fields>, replace?: boolean }) {
+    if (replace) {
+      return newFields as Fields
+    }
+    const fieldsToSet = { ...priorFields, ...newFields } as Fields
+    return fieldsToSet
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -52,11 +75,14 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     const field = fields[id]
     const isValid = !field.required || (field.required && !!value)
     dispatchFields({
-      [id]: {
-        ...field,
-        value,
-        isValid,
-      },
+      replace: field.replace,
+      newFields: {
+        [id]: {
+          ...field,
+          value,
+          isValid,
+        },
+      }
     })
   };
 
@@ -64,13 +90,15 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
     return (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
       const { value } = e.target;
       dispatchFields({
-        [field.id]: {
-          ...field,
-          airtableIds: {
-            ...field.airtableIds,
-            [foreignKey]: value
-          }
-        },
+        newFields: {
+          [field.id]: {
+            ...field,
+            airtableIds: {
+              ...field.airtableIds,
+              [foreignKey]: value
+            }
+          },
+        }
       })
     }
   }
@@ -78,22 +106,25 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
   const addFields = (fieldsToAdd: Field[]) => {
     const newFields: Fields = {}
     fieldsToAdd.forEach(newField => {
+      if (fields[newField.id]) return
       newFields[newField.id] = {
         ...newField,
         isValid: !newField.required || (newField.required && !!newField.value)
       }
     })
-    dispatchFields(newFields)
+    dispatchFields({ newFields })
   }
 
   const deleteAField = (id: keyof Fields) => {
     const field = fields[id]
     dispatchFields({
-      [id]: {
-        ...field,
-        isValid: true,
-        action: 'delete'
-      } as Field
+      newFields: {
+        [id]: {
+          ...field,
+          isValid: true,
+          action: 'delete'
+        } as Field
+      }
     })
   }
 

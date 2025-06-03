@@ -6,14 +6,14 @@ import { hydrateIdList } from "../../utils/projectUtils";
 import React from "react";
 
 export default function () {
-  const { metricTypes } = useDataContext()
-  const { handleInputChange, addFields } = useFormContext();
+  const { metricTypes, loading } = useDataContext()
+  const { handleInputChange, addFields, fields } = useFormContext();
   const { project } = useProject();
 
-  const fields = useMemo(() => {
-    if (!project || !metricTypes) return
+  useEffect(() => {
+    if (loading || !project || !metricTypes) { return }
     const _metricTypes = hydrateIdList(project?.["Metric types"], metricTypes);
-    return _metricTypes.map(m => ({
+    const fieldsToAdd = _metricTypes.map(m => ({
       name: `${m.id}-metric`,
       value: undefined,
       label: m.Name,
@@ -24,15 +24,16 @@ export default function () {
         'Metric type': m.id
       }
     }))
-  }, [project, metricTypes])
+    addFields(fieldsToAdd)
+  }, [loading, project, metricTypes])
 
-  useEffect(() => {
-    if (!fields) { return }
-    addFields(fields)
+
+  const displayFields = useMemo(() => {
+    return Object.values(fields).filter(f => f.formKey === 'metricUpdates')
   }, [fields])
 
   return <>
-    {fields && fields.map(field => (
+    {displayFields && displayFields.map(field => (
       <React.Fragment key={field.id}>
         <label className="usa-label" htmlFor={field.id}>{field.label}</label>
         <input className="usa-input" id={field.id} name={field.name} onChange={handleInputChange} defaultValue={field.value} type="number" pattern="[0-9]" />
