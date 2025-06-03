@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, ReactNode, useContext, useReducer } from 'react'
+import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useReducer } from 'react'
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
 export type Field = {
@@ -41,10 +41,21 @@ const { Provider } = FormContext;
 
 export const useFormContext = () => useContext(FormContext)
 
-export function FormContextProvider({ children }: { children: ReactNode }) {
-  const [fields, dispatchFields] = useReducer<Fields, [newFields: Partial<Fields>]>(fieldsReducer, {});
+export function FormContextProvider({ type, children }: { type: 'create-update' | 'add-project' | 'update-project', children: ReactNode }) {
+  const sessionStorageId = `${type}` // todo better id
+  let defaultFields = {}
+  if (window.sessionStorage?.getItem(sessionStorageId)) {
+    defaultFields = JSON.parse(window.sessionStorage.getItem(sessionStorageId) || "")
+  }
+  const [fields, dispatchFields] = useReducer<Fields, [newFields: Partial<Fields>]>(fieldsReducer, defaultFields);
+
+  useEffect(() => {
+    window.sessionStorage.setItem(sessionStorageId, JSON.stringify(fields))
+  }, [fields])
+
   function fieldsReducer (priorFields: Fields, newFields: Partial<Fields>) {
-    return {...priorFields, ...newFields } as Fields
+    const fieldsToSet = {...priorFields, ...newFields } as Fields
+    return fieldsToSet
   }
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
@@ -78,6 +89,7 @@ export function FormContextProvider({ children }: { children: ReactNode }) {
   const addFields = (fieldsToAdd: Field[]) => {
     const newFields: Fields = {}
     fieldsToAdd.forEach(newField => {
+      if (fields[newField.id]) return
       newFields[newField.id] = {
         ...newField,
         isValid: !newField.required || (newField.required && !!newField.value)

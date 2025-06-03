@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, useEffect, useMemo } from "react";
 import { useFormContext } from "../../contexts/FormContext"
 import { useDataContext } from "../../contexts/DataContext";
 import useProject from "../../utils/useProject";
@@ -6,28 +6,30 @@ import { useLocation, useNavigate } from "react-router";
 
 export default function () {
   const { projects } = useDataContext()
-  const { handleInputChange, addFields } = useFormContext();
+  const { handleInputChange, addFields, fields } = useFormContext();
   const { projectId } = useProject();
   const navigate = useNavigate()
   const location = useLocation()
 
-  const field = {
-    name: 'project',
-    value: projectId || undefined,
-    label: 'Project',
-    required: true,
-    id: 'project',
-    formKey: 'project'
-  }
+  const field = useMemo(() => fields['project'], [fields])
 
   useEffect(() => {
-    addFields([field])
+    addFields([{
+      name: 'project',
+      value: projectId || undefined,
+      label: 'Project',
+      required: true,
+      id: 'project',
+      formKey: 'project'
+    }])
   }, [])
 
   function handleProjectChange(e: ChangeEvent<HTMLSelectElement>) {
     handleInputChange(e)
-    navigate({...location, search: `?projectId=${e.target.value}`}, { replace: true })
+    navigate({ ...location, search: `?projectId=${e.target.value}` }, { replace: true })
   }
+
+  if (!field) return <></>
 
   return <>
     <label className="usa-label" htmlFor={field.id}>{field.label}</label>

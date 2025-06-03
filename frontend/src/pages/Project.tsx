@@ -105,7 +105,7 @@ export default function () {
               const metricType = metricTypes?.[metricTypeId]
               if (!metricType) { return }
               return (
-                <tr>
+                <tr key={id}>
                   <td>{metricType.Name}</td>
                   <td>{update.Value}</td>
                   <td>{update.Created ? new Date(update.Created).toLocaleDateString() : ''}</td>
