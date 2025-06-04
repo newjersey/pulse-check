@@ -43,7 +43,7 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
   async function fetchData(_tableNames: TableNameKeys[number][]) {
     setLoading(true);
     try {
-      await Promise.all(_tableNames.map(async tableName => {
+      const dataUpdateFragments = await Promise.all(_tableNames.map(async tableName => {
         const response = await fetch(
           `${apiURL}/api/${tableName}`,
           { headers: { Authorization: 'Basic ' + authToken } }
@@ -52,8 +52,10 @@ export function DataContextProvider({ children }: { children: ReactNode }) {
           throw new Error('Network response was not ok');
         }
         const result = await response.json();
-        dispatchData({ [tableName]: result.data });
+        return { [tableName]: result.data }
       }))
+      const dataUpdate = dataUpdateFragments.reduce((prev, fragment) => ({...prev, ...fragment}), {})
+      dispatchData(dataUpdate)
     } catch (error) {
       console.error(error);
     } finally {
