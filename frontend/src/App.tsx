@@ -10,8 +10,8 @@ import { DataContextProvider } from './contexts/DataContext';
 
 function App() {
   return (
-    <DataContextProvider>
-      <ErrorBoundary>
+    <ErrorBoundary>
+      <DataContextProvider>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Projects />} />
@@ -21,8 +21,8 @@ function App() {
           <Route path="/projects/edit" element={<EditProject key="edit" />} />
           <Route path="/projects/update" element={<SubmitUpdate />} />
         </Routes>
-      </ErrorBoundary>
-    </DataContextProvider>
+      </DataContextProvider>
+    </ErrorBoundary>
   )
 }
 
