@@ -1,4 +1,4 @@
-import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useMemo, useReducer } from 'react'
+import { ChangeEvent, createContext, ReactNode, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import useProject from '../utils/useProject';
 // import { ProjectAddForm, ProjectEditForm, UpdateForm } from '../utils/types';
 
@@ -27,6 +27,10 @@ type FormContextType = {
   fieldsByFormKey: Function;
   isFormInvalid: Function;
   getForeignKeyHandler: Function;
+  error?: string;
+  setError: Function;
+  clearFormData: Function;
+
 }
 
 const FormContext = createContext<FormContextType>({
@@ -37,6 +41,9 @@ const FormContext = createContext<FormContextType>({
   fieldsByFormKey: () => { },
   isFormInvalid: () => { },
   getForeignKeyHandler: () => { },
+  setError: () => { },
+  clearFormData: () => { }
+
 });
 
 const { Provider } = FormContext;
@@ -45,22 +52,43 @@ export const useFormContext = () => useContext(FormContext)
 
 export function FormContextProvider({ type, children }: { type: 'create-update' | 'add-project' | 'update-project', children: ReactNode }) {
   const { projectId } = useProject()
-
   const sessionStorageId = useMemo(() => {
-    if (!projectId) return
+    if (!projectId?.length) return
     return `${projectId}-${type}`
   }, [projectId])
-
-  let defaultFields = {}
-  if (sessionStorageId && window.sessionStorage?.getItem(sessionStorageId)) {
-    defaultFields = JSON.parse(window.sessionStorage.getItem(sessionStorageId) || "")
+ 
+  let defaultFields = {} 
+  let defaultError
+  const storedData = window.sessionStorage?.getItem(sessionStorageId || '')
+  if (storedData) {
+    const parsed = JSON.parse(storedData)
+    defaultFields = parsed.fields
+    defaultError = parsed.error
   }
+
   const [fields, dispatchFields] = useReducer<Fields, [{ newFields: Partial<Fields>, replace?: boolean }]>(fieldsReducer, defaultFields);
+  const [error, _setError] = useState<string>(defaultError);
 
   useEffect(() => {
-    if (!sessionStorageId) return
-    window.sessionStorage.setItem(sessionStorageId, JSON.stringify(fields))
+    if (!sessionStorageId || !fields) return
+    window.sessionStorage.setItem(sessionStorageId, JSON.stringify({ fields, error }))
   }, [fields])
+
+  const setError = (e: string) => {
+    if (sessionStorageId) {
+      window.sessionStorage.setItem(sessionStorageId, JSON.stringify({
+        fields, error: e
+      }))
+    }
+    _setError(e)
+  }
+
+  function clearFormData() {
+    _setError('')
+    if (sessionStorageId) {
+      window.sessionStorage.removeItem(sessionStorageId)
+    }
+  }
 
   function fieldsReducer(priorFields: Fields, { newFields, replace }: { newFields: Partial<Fields>, replace?: boolean }) {
     if (replace) {
@@ -144,7 +172,7 @@ export function FormContextProvider({ type, children }: { type: 'create-update' 
     return Object.values(fields).some(f => f.isValid === false)
   }
 
-  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid, getForeignKeyHandler }}>
+  return <Provider value={{ fields, handleInputChange, addFields, deleteAField, fieldsByFormKey, isFormInvalid, getForeignKeyHandler, error, setError, clearFormData }}>
     {children}
   </Provider>
 }

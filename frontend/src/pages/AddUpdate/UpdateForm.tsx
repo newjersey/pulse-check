@@ -2,14 +2,14 @@ import { useDataContext } from "../../contexts/DataContext";
 import { useFormContext } from "../../contexts/FormContext";
 import { MetricUpdates, PhaseChangeDate, ProjectField, ProjectNeeds, ProjectPhase, UpdateDescription, UpdateStatus } from "../../components/FormFields";
 import useProject from "../../utils/useProject";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export default function () {
-  const { loadingResponse, postData, setReloadTablesAfterNavigate } = useDataContext();
-  const { fields, fieldsByFormKey, isFormInvalid } = useFormContext();
+  const { loadingResponse, postData, fetchData } = useDataContext();
+  const { fields, fieldsByFormKey, isFormInvalid, error, setError, clearFormData } = useFormContext();
   const { projectId } = useProject();
-  const [error, setError] = useState<string>();
   const [success, setSuccess] = useState(false);
+
 
   async function onSubmit(e: any) {
     setError(undefined);
@@ -34,15 +34,27 @@ export default function () {
       const response = await postData('update', dataToPost)
       if (response.status == 200) {
         setSuccess(true)
-        setReloadTablesAfterNavigate(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
         return
       }
       throw new Error("Response was not ok")
     } catch (e) {
-      console.log(e)
+      if (import.meta.env.DEV) {
+        console.error(e)
+      }
       setError("Could not update project")
+      // Refresh to refetch data, because airtable doesn't have a rollback capability
+      window.location.reload()
     }
   }
+
+  useEffect(() => {
+    if (success) {
+      return () => {
+        clearFormData();
+        fetchData(['projects', 'updates', 'deliverables', 'needs', 'metricsUpdates'])
+      }
+    }
+  }, [success])
 
   if (loadingResponse || !fields) {
     return <>Loading...</>
@@ -53,10 +65,9 @@ export default function () {
   }
 
   return <form onSubmit={(e) => { e.preventDefault() }}>
-    {/* TODO: ACTUAL ALERT COMPONENT */}
-    {error && <h1>Error: {error}</h1>}
+    {error && <h1 key={projectId + '-error'}>Error: {error}</h1>}
     <ProjectField />
-    {projectId && <React.Fragment key={projectId}>
+    {projectId && <React.Fragment key={projectId + '-fields'}>
       <UpdateDescription />
       <UpdateStatus />
       <ProjectPhase />
