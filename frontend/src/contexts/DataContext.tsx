@@ -10,14 +10,16 @@ export type DataContextType = DataType & {
   fetchData: (endpoint: TableNameKeys[number][]) => void;
 }
 
-const DataContext = createContext<DataContextType>({
+export const defaultDataContext = {
   authToken: null,
   setAuthToken: () => { },
   loading: false,
   loadingResponse: false,
   postData: () => { },
   fetchData: () => { },
-});
+}
+
+const DataContext = createContext<DataContextType>(defaultDataContext);
 
 const { Provider } = DataContext;
 
